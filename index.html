@@ -6,723 +6,242 @@
     <title>美食老虎机 - 今天吃什么</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Microsoft YaHei', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
-            position: relative;
-        }
-        
-        /* 浮动美食背景 */
-        .floating-food {
-            position: absolute;
-            font-size: 2rem;
-            opacity: 0.2;
-            z-index: -1;
-            animation: floating 15s infinite ease-in-out;
-        }
-        
-        @keyframes floating {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(10deg);
-            }
-        }
-        
-        .container {
-            max-width: 900px;
-            width: 100%;
-            text-align: center;
-            z-index: 1;
-        }
-        
-        header {
-            margin-bottom: 30px;
-            position: relative;
-        }
-        
-        h1 {
-            color: #d35400;
-            font-size: 2.8rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            margin-bottom: 10px;
-            position: relative;
-            display: inline-block;
-        }
-        
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(to right, #e74c3c, #f39c12);
-            border-radius: 2px;
-        }
-        
-        .date-display {
-            color: #7f8c8d;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .holiday-mode {
-            background: linear-gradient(to right, #e74c3c, #f39c12);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            margin-top: 10px;
-            display: inline-block;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        /* 老虎机样式 */
-        .slot-machine {
-            background: linear-gradient(135deg, #2c3e50, #4a69bd);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
-            border: 5px solid #f39c12;
-        }
-        
-        .slot-machine::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(
-                transparent,
-                transparent 5px,
-                rgba(255, 255, 255, 0.1) 5px,
-                rgba(255, 255, 255, 0.1) 10px
-            );
-            pointer-events: none;
-        }
-        
-        .reels-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            perspective: 1000px;
-            position: relative;
-        }
-        
-        .reel {
-            width: 120px;
-            height: 200px;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0, 0, 0, 0.3);
-            transform-style: preserve-3d;
-        }
-        
-        .reel-inner {
-            position: absolute;
-            width: 100%;
-            top: 0;
-            transition: top 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-        }
-        
-        .reel-item {
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        
-        .reel-item.special {
-            background: linear-gradient(135deg, #e74c3c, #f39c12);
-        }
-        
-        .reel-glass {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(
-                125deg, 
-                rgba(255,255,255,0.3) 0%, 
-                rgba(255,255,255,0.1) 40%,
-                rgba(255,255,255,0.1) 60%,
-                rgba(255,255,255,0.3) 100%
-            );
-            pointer-events: none;
-            border-radius: 10px;
-        }
-        
-        .slot-middle {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            right: 15px;
-            height: 100px;
-            border-top: 3px dashed #e74c3c;
-            border-bottom: 3px dashed #e74c3c;
-            transform: translateY(-50%);
-            pointer-events: none;
-            z-index: 10;
-            box-sizing: border-box;
-        }
-        
-        .controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .spin-button {
-            background: linear-gradient(to right, #e74c3c, #f39c12);
-            color: white;
-            border: none;
-            padding: 18px 50px;
-            font-size: 1.4rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.5);
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .spin-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(231, 76, 60, 0.6);
-        }
-        
-        .spin-button:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .spin-button::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: rotate(30deg);
-            transition: all 0.5s;
-        }
-        
-        .spin-button:hover::after {
-            transform: rotate(30deg) translate(10%, 10%);
-        }
-        
-        .result-container {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            margin-bottom: 30px;
-            width: 100%;
-            display: none;
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .result-title {
-            color: #e74c3c;
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            position: relative;
-            display: inline-block;
-        }
-        
-        .result-title::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 3px;
-            background: linear-gradient(to right, #e74c3c, #f39c12);
-            border-radius: 2px;
-        }
-        
-        .result-content {
-            font-size: 2.8rem;
-            color: #d35400;
-            font-weight: bold;
-            margin-bottom: 25px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            background: linear-gradient(135deg, #fff4e6 0%, #ffeaa7 100%);
-            border-radius: 15px;
-            border: 2px dashed #f39c12;
-        }
-        
-        .qr-code {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
-            background: #f5f5f5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-        }
-        
-        .qr-code i {
-            font-size: 60px;
-            color: #e74c3c;
-            margin-bottom: 15px;
-        }
-        
-        .qr-code-text {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-            text-align: center;
-        }
-        
-        .food-list {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .food-list-title {
-            color: #e74c3c;
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            text-align: left;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ffeaa7;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 1;
-        }
-        
-        .food-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        
-        .food-tag {
-            background: linear-gradient(to right, #74b9ff, #0984e3);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .food-tag.special {
-            background: linear-gradient(to right, #e74c3c, #f39c12);
-        }
-        
-        footer {
-            margin-top: 30px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        @media (max-width: 900px) {
-            .content {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .controls {
-                width: 100%;
-                max-width: 400px;
-            }
-        }
-        
-        @media (max-width: 600px) {
-            .reel {
-                width: 80px;
-                height: 150px;
-            }
-            
-            .reel-item {
-                height: 75px;
-                font-size: 1.4rem;
-            }
-            
-            .slot-middle {
-                height: 75px;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .result-content {
-                font-size: 2.2rem;
-            }
-            
-            .spin-button {
-                padding: 15px 40px;
-                font-size: 1.2rem;
-            }
-            
-            .food-list {
-                max-height: 200px;
-            }
-        }
-        
-        .confetti {
-            position: absolute;
-            width: 15px;
-            height: 15px;
-            opacity: 0;
-            animation: confetti-fall 5s linear infinite;
-        }
-        
-        @keyframes confetti-fall {
-            0% {
-                opacity: 1;
-                transform: translateY(-100px) rotate(0deg);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(100vh) rotate(720deg);
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Microsoft YaHei', sans-serif; }
+        body { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; overflow-x: hidden; position: relative; }
+        .container { max-width: 900px; width: 100%; text-align: center; z-index: 1; }
+        header { margin-bottom: 30px; position: relative; }
+        h1 { color: #d35400; font-size: 2.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); margin-bottom: 10px; position: relative; display: inline-block; }
+        h1::after { content:''; position: absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:100px; height:4px; background:linear-gradient(to right,#e74c3c,#f39c12); border-radius:2px; }
+        .date-display { color:#7f8c8d; font-size:1.2rem; margin-bottom:20px; background:rgba(255,255,255,0.8); padding:8px 15px; border-radius:20px; display:inline-block; box-shadow:0 3px 10px rgba(0,0,0,0.1); }
+        .holiday-mode { background:linear-gradient(to right,#e74c3c,#f39c12); color:white; padding:8px 15px; border-radius:20px; margin-top:10px; display:inline-block; animation:pulse 2s infinite; }
+        @keyframes pulse { 0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);} }
+        .slot-machine { background:linear-gradient(135deg,#2c3e50,#4a69bd); border-radius:20px; padding:30px; box-shadow:0 15px 35px rgba(0,0,0,0.3); margin-bottom:30px; position:relative; overflow:hidden; border:5px solid #f39c12; }
+        .reels-container { display:flex; justify-content:center; gap:15px; margin-bottom:30px; perspective:1000px; position:relative; }
+        .reel { width:120px; height:200px; background:white; border-radius:10px; overflow:hidden; position:relative; box-shadow:inset 0 0 15px rgba(0,0,0,0.3),0 5px 15px rgba(0,0,0,0.3); transform-style:preserve-3d; }
+        .reel-inner { position:absolute; width:100%; top:0; transition: top 4s cubic-bezier(0.17,0.67,0.83,0.67); }
+        .reel-item { height:100px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; font-weight:bold; color:white; text-shadow:1px 1px 2px rgba(0,0,0,0.5); }
+        .reel-item.special { background:linear-gradient(135deg,#e74c3c,#f39c12); }
+        .reel-glass { position:absolute; top:0; left:0; right:0; bottom:0; background:linear-gradient(125deg,rgba(255,255,255,0.3) 0%,rgba(255,255,255,0.1) 40%,rgba(255,255,255,0.1) 60%,rgba(255,255,255,0.3) 100%); pointer-events:none; border-radius:10px; }
+        .slot-middle { position:absolute; top:50%; left:15px; right:15px; height:100px; border-top:3px dashed #e74c3c; border-bottom:3px dashed #e74c3c; transform:translateY(-50%); pointer-events:none; z-index:10; box-sizing:border-box; }
+        .controls { display:flex; flex-direction:column; align-items:center; }
+        .spin-button { background:linear-gradient(to right,#e74c3c,#f39c12); color:white; border:none; padding:18px 50px; font-size:1.4rem; border-radius:50px; cursor:pointer; transition:all 0.3s; box-shadow:0 8px 20px rgba(231,76,60,0.5); margin-bottom:30px; position:relative; overflow:hidden; }
+        .spin-button:hover { transform:translateY(-3px); box-shadow:0 12px 25px rgba(231,76,60,0.6); }
+        .spin-button:disabled { background:#bdc3c7; cursor:not-allowed; transform:none; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
+        .result-container { background:white; border-radius:20px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.15); margin-bottom:30px; width:100%; display:none; animation:fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+        .result-title { color:#e74c3c; font-size:1.8rem; margin-bottom:15px; position:relative; display:inline-block; }
+        .result-title::after { content:''; position:absolute; bottom:-5px; left:50%; transform:translateX(-50%); width:50px; height:3px; background:linear-gradient(to right,#e74c3c,#f39c12); border-radius:2px; }
+        .result-content { display:flex; justify-content:center; gap:20px; font-size:2.2rem; color:#d35400; font-weight:bold; margin-bottom:25px; text-shadow:1px 1px 2px rgba(0,0,0,0.1); padding:10px; background:linear-gradient(135deg,#fff4e6 0%,#ffeaa7 100%); border-radius:15px; border:2px dashed #f39c12; }
+        .result-item { display:flex; flex-direction:column; align-items:center; }
+        .qr-code { width:200px; height:220px; margin:20px auto; background:#f5f5f5; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1); padding:15px; }
+        .qr-code img { width:130px; height:130px; margin-bottom:10px; }
+        .qr-code-text { font-size:0.9rem; color:#7f8c8d; text-align:center; }
+        .food-list { background:white; border-radius:20px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.15); width:100%; max-height:300px; overflow-y:auto; margin-top:20px; }
+        .food-list-title { color:#e74c3c; font-size:1.5rem; margin-bottom:15px; text-align:left; padding-bottom:10px; border-bottom:2px solid #ffeaa7; position:sticky; top:0; background:white; z-index:1; }
+        .food-items { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+        .food-tag { background:linear-gradient(to right,#74b9ff,#0984e3); color:white; padding:8px 15px; border-radius:20px; font-size:0.9rem; box-shadow:0 3px 10px rgba(0,0,0,0.1); }
+        .food-tag.special { background:linear-gradient(to right,#e74c3c,#f39c12); }
+        footer { margin-top:30px; color:#7f8c8d; font-size:0.9rem; padding:20px; text-align:center; }
+        .debug-info { background:rgba(0,0,0,0.8); color:white; padding:10px; border-radius:5px; position:fixed; bottom:10px; right:10px; font-size:12px; display:none; }
+        /* 悬浮二维码角标 */
+        .floating-qr { position:fixed; bottom:20px; right:20px; width:90px; height:100px; background:white; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.2); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; z-index:999; }
+        .floating-qr img { width:70px; height:70px; margin-bottom:5px; }
+        .floating-qr-text { font-size:0.75rem; color:#333; text-align:center; }
+        /* 分享按钮 */
+.share-buttons { display:flex; justify-content:center; gap:10px; margin-top:15px; }
+.share-btn { border:none; border-radius:25px; padding:8px 15px; cursor:pointer; color:white; font-size:0.9rem; display:flex; align-items:center; gap:5px; }
+.share-btn.wechat { background:#1AAD19; }
+.share-btn.qq { background:#12B7F5; }
+.share-btn.weibo { background:#E6162D; }
+.share-btn.douyin { background:#000; }
+
+/* 二维码放大遮罩 */
+.qr-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:1000; }
+.qr-modal-content img { width:250px; height:250px; border-radius:15px; box-shadow:0 5px 20px rgba(0,0,0,0.3); }
+
     </style>
 </head>
 <body>
-    <!-- 浮动美食背景 -->
-    <div class="floating-food" style="top: 10%; left: 5%; animation-delay: 0s;">🍲</div>
-    <div class="floating-food" style="top: 20%; right: 10%; animation-delay: 1s;">🍚</div>
-    <div class="floating-food" style="top: 40%; left: 8%; animation-delay: 2s;">🍜</div>
-    <div class="floating-food" style="top: 60%; right: 5%; animation-delay: 3s;">🍢</div>
-    <div class="floating-food" style="top: 80%; left: 15%; animation-delay: 4s;">🥘</div>
-    <div class="floating-food" style="top: 30%; right: 15%; animation-delay: 5s;">🍖</div>
-    <div class="floating-food" style="top: 70%; left: 20%; animation-delay: 6s;">🥗</div>
-    
     <div class="container">
         <header>
             <h1><i class="fas fa-utensils"></i> 今天吃什么？</h1>
             <div class="date-display" id="dateDisplay"></div>
-            <div class="holiday-mode" id="holidayMode" style="display: none;">
+            <div class="holiday-mode" id="holidayMode" style="display:none;">
                 <i class="fas fa-gift"></i> 节日模式已开启，大餐概率提升！
             </div>
         </header>
-        
         <div class="slot-machine">
-            <div class="reels-container" id="reelsContainer">
-                <!-- 老虎机滚轮由JS动态生成 -->
-            </div>
+            <div class="reels-container" id="reelsContainer"></div>
             <div class="slot-middle"></div>
-            <div class="controls">
-                <button class="spin-button" id="spinButton">
-                    <i class="fas fa-redo-alt"></i> 拉杆开始！
-                </button>
-            </div>
+            <div class="controls"><button class="spin-button" id="spinButton"><i class="fas fa-redo-alt"></i> 拉杆开始！</button></div>
         </div>
-        
         <div class="result-container" id="resultContainer">
             <div class="result-title">推荐美食</div>
             <div class="result-content" id="resultContent"></div>
             <div class="qr-code">
-                <i><img src="https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg"></i>
-                <div class="qr-code-text">扫描二维码<br>领美食券</div>
+                <img src="https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg" alt="领券二维码">
+                <div class="qr-code-text">扫码领券，享更多优惠</div>
             </div>
         </div>
-        
         <div class="food-list">
-            <div class="food-list-title">美食清单 (共23种)</div>
-            <div class="food-items" id="foodItems">
-                <!-- 美食标签由JS动态生成 -->
-            </div>
+            <div class="food-list-title">美食清单</div>
+            <div class="food-items" id="foodItems"></div>
         </div>
     </div>
-    
-    <footer>
-        © 2025 美食老虎机 - 解决您的选择困难症 | 逢周末节假日大餐概率提升
-    </footer>
+    <footer>© 2023 美食老虎机 - 解决您的选择困难症</footer>
+    <div class="debug-info" id="debugInfo"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 显示当前日期
-            const dateDisplay = document.getElementById('dateDisplay');
-            const holidayMode = document.getElementById('holidayMode');
-            const now = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-            dateDisplay.innerHTML = `<i class="fas fa-calendar-alt"></i> ${now.toLocaleDateString('zh-CN', options)}`;
-            
-            // 美食数据 - 增加了您提到的所有美食
-            const foodItems = [
-                { name: "火锅", type: "大餐", color: "#e74c3c", emoji: "🍲" },
-                { name: "披萨", type: "西餐", color: "#3498db", emoji: "🍕" },
-                { name: "寿司", type: "日料", color: "#2ecc71", emoji: "🍣" },
-                { name: "烧烤", type: "大餐", color: "#f39c12", emoji: "🍢" },
-                { name: "炸鸡", type: "快餐", color: "#9b59b6", emoji: "🍗" },
-                { name: "拉面", type: "面食", color: "#1abc9c", emoji: "🍜" },
-                { name: "炒饭", type: "主食", color: "#d35400", emoji: "🍚" },
-                { name: "沙拉", type: "轻食", color: "#27ae60", emoji: "🥗" },
-                { name: "汉堡", type: "快餐", color: "#8e44ad", emoji: "🍔" },
-                { name: "牛排", type: "西餐", color: "#c0392b", emoji: "🥩" },
-                { name: "饺子", type: "中餐", color: "#16a085", emoji: "🥟" },
-                { name: "咖喱", type: "亚洲", color: "#e67e22", emoji: "🍛" },
-                // 新增的美食
-                { name: "砂锅", type: "中餐", color: "#8e44ad", emoji: "🥘" },
-                { name: "盖饭", type: "主食", color: "#f1c40f", emoji: "🍛" },
-                { name: "凉皮", type: "小吃", color: "#27ae60", emoji: "🍜" },
-                { name: "酸辣粉", type: "小吃", color: "#e67e22", emoji: "🍜" },
-                { name: "螺蛳粉", type: "小吃", color: "#16a085", emoji: "🍜" },
-                { name: "热干面", type: "面食", color: "#f39c12", emoji: "🍜" },
-                { name: "烩面", type: "面食", color: "#d35400", emoji: "🍜" },
-                { name: "麻辣烫", type: "小吃", color: "#c0392b", emoji: "🍲" },
-                { name: "自助餐", type: "大餐", color: "#9b59b6", emoji: "🍽️" },
-                { name: "烤肉", type: "大餐", color: "#e74c3c", emoji: "🍖" }
-            ];
-            
-            const reelsContainer = document.getElementById('reelsContainer');
-            const spinButton = document.getElementById('spinButton');
-            const resultContainer = document.getElementById('resultContainer');
-            const resultContent = document.getElementById('resultContent');
-            const foodItemsContainer = document.getElementById('foodItems');
-            
-            let isSpinning = false;
-            let reels = [];
-            
-            // 生成老虎机滚轮
-            function createSlotMachine() {
-                reelsContainer.innerHTML = '';
-                reels = [];
-                
-                // 创建3个滚轮
-                for (let i = 0; i < 3; i++) {
-                    const reel = document.createElement('div');
-                    reel.className = 'reel';
-                    
-                    const reelInner = document.createElement('div');
-                    reelInner.className = 'reel-inner';
-                    
-                    // 每个滚轮添加多个食物选项（重复几次以形成循环）
-                    for (let j = 0; j < 3; j++) {
-                        foodItems.forEach(item => {
-                            const reelItem = document.createElement('div');
-                            reelItem.className = `reel-item ${item.type === '大餐' ? 'special' : ''}`;
-                            reelItem.style.backgroundColor = item.color;
-                            reelItem.textContent = item.emoji;
-                            reelItem.setAttribute('data-name', item.name);
-                            reelInner.appendChild(reelItem);
-                        });
-                    }
-                    
-                    const reelGlass = document.createElement('div');
-                    reelGlass.className = 'reel-glass';
-                    
-                    reel.appendChild(reelInner);
-                    reel.appendChild(reelGlass);
-                    reelsContainer.appendChild(reel);
-                    
-                    // 保存滚轮引用
-                    reels.push({
-                        element: reelInner,
-                        position: 0
+    <!-- 悬浮二维码角标 -->
+    <div class="floating-qr">
+        <img src="https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg" alt="领券二维码">
+        <div class="floating-qr-text">领券</div>
+    </div>
+    <!-- 结果区下方加分享按钮 -->
+<div class="share-buttons">
+  <button class="share-btn wechat"><i class="fab fa-weixin"></i> 微信</button>
+  <button class="share-btn qq"><i class="fab fa-qq"></i> QQ</button>
+  <button class="share-btn weibo"><i class="fab fa-weibo"></i> 微博</button>
+  <button class="share-btn douyin"><i class="fas fa-music"></i> 抖音</button>
+</div>
+
+<!-- 放大二维码遮罩层 -->
+<div class="qr-modal" id="qrModal">
+  <div class="qr-modal-content">
+    <img src="https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg" alt="二维码大图">
+  </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const foodItems=[
+            { name:"火锅", type:"大餐", color:"#e74c3c", emoji:"🍲" },
+            { name:"披萨", type:"西餐", color:"#3498db", emoji:"🍕" },
+            { name:"寿司", type:"日料", color:"#2ecc71", emoji:"🍣" },
+            { name:"烧烤", type:"大餐", color:"#f39c12", emoji:"🍢" },
+            { name:"炸鸡", type:"快餐", color:"#9b59b6", emoji:"🍗" },
+            { name:"拉面", type:"面食", color:"#1abc9c", emoji:"🍜" },
+            { name:"炒饭", type:"主食", color:"#d35400", emoji:"🍚" },
+            { name:"沙拉", type:"轻食", color:"#27ae60", emoji:"🥗" },
+            { name:"汉堡", type:"快餐", color:"#8e44ad", emoji:"🍔" },
+            { name:"牛排", type:"西餐", color:"#c0392b", emoji:"🥩" },
+            { name:"饺子", type:"中餐", color:"#16a085", emoji:"🥟" },
+            { name:"咖喱", type:"亚洲", color:"#e67e22", emoji:"🍛" },
+            { name:"砂锅", type:"中餐", color:"#8e44ad", emoji:"🥘" },
+            { name:"盖饭", type:"主食", color:"#f1c40f", emoji:"🍛" },
+            { name:"凉皮", type:"小吃", color:"#27ae60", emoji:"🍝" },
+            { name:"酸辣粉", type:"小吃", color:"#e67e22", emoji:"🍜" },
+            { name:"螺蛳粉", type:"小吃", color:"#16a085", emoji:"🍲" },
+            { name:"热干面", type:"面食", color:"#f39c12", emoji:"🍜" },
+            { name:"烩面", type:"面食", color:"#d35400", emoji:"🍜" },
+            { name:"麻辣烫", type:"小吃", color:"#c0392b", emoji:"🍲" },
+            { name:"自助餐", type:"大餐", color:"#9b59b6", emoji:"🍽️" },
+            { name:"烤肉", type:"大餐", color:"#e74c3c", emoji:"🍖" }
+        ];
+        const reelsContainer=document.getElementById('reelsContainer');
+        const spinButton=document.getElementById('spinButton');
+        const resultContainer=document.getElementById('resultContainer');
+        const resultContent=document.getElementById('resultContent');
+        const foodItemsContainer=document.getElementById('foodItems');
+        const debugInfo=document.getElementById('debugInfo');
+        let isSpinning=false; let reels=[];
+
+        // 悬浮二维码放大
+const floatingQr = document.querySelector('.floating-qr');
+const qrModal = document.getElementById('qrModal');
+
+floatingQr.addEventListener('click', ()=>{ qrModal.style.display='flex'; });
+qrModal.addEventListener('click', ()=>{ qrModal.style.display='none'; });
+
+// 分享按钮
+document.querySelectorAll('.share-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    alert("分享功能待接入，可复制链接或截图分享哦~");
+  });
+});
+
+        function createSlotMachine(){
+            reelsContainer.innerHTML=''; reels=[];
+            for(let i=0;i<3;i++){
+                const reel=document.createElement('div'); reel.className='reel';
+                const reelInner=document.createElement('div'); reelInner.className='reel-inner'; reelInner.id=`reel-${i}`;
+                for(let j=0;j<3;j++){
+                    foodItems.forEach((item,index)=>{
+                        const reelItem=document.createElement('div');
+                        reelItem.className=`reel-item ${item.type==='大餐'?'special':''}`;
+                        reelItem.style.backgroundColor=item.color;
+                        reelItem.textContent=item.emoji;
+                        reelItem.setAttribute('data-name',item.name);
+                        reelInner.appendChild(reelItem);
                     });
                 }
+                const reelGlass=document.createElement('div'); reelGlass.className='reel-glass';
+                reel.appendChild(reelInner); reel.appendChild(reelGlass); reelsContainer.appendChild(reel);
+                reels.push({element:reelInner,position:0,id:i});
             }
-            
-            // 生成美食标签
-            function createFoodTags() {
-                foodItemsContainer.innerHTML = '';
-                
-                foodItems.forEach(item => {
-                    const tag = document.createElement('div');
-                    tag.className = `food-tag ${item.type === '大餐' ? 'special' : ''}`;
-                    tag.innerHTML = `${item.emoji} ${item.name}`;
-                    tag.title = item.type; // 添加悬停提示
-                    foodItemsContainer.appendChild(tag);
-                });
-            }
-            
-            // 检查是否是周末或节假日
-            function isSpecialDay() {
-                const day = now.getDay();
-                // 周末（周六=6，周日=0）
-                if (day === 0 || day === 6) return true;
-                
-                // 这里可以添加更多节假日判断逻辑
-                const month = now.getMonth() + 1;
-                const date = now.getDate();
-                
-                // 元旦
-                if (month === 1 && date === 1) return true;
-                // 劳动节
-                if (month === 5 && date >= 1 && date <= 3) return true;
-                // 国庆节
-                if (month === 10 && date >= 1 && date <= 7) return true;
-                // 春节（简单模拟）
-                if (month === 2 && date >= 10 && date <= 17) return true;
-                
-                return false;
-            }
-            
-            // 创建彩色纸屑效果
-            function createConfetti() {
-                const colors = ['#e74c3c', '#f39c12', '#3498db', '#2ecc71', '#9b59b6'];
-                
-                for (let i = 0; i < 50; i++) {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.width = 10 + Math.random() * 10 + 'px';
-                    confetti.style.height = 10 + Math.random() * 10 + 'px';
-                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-                    confetti.style.animationDelay = Math.random() * 5 + 's';
-                    confetti.style.animationDuration = 3 + Math.random() * 5 + 's';
-                    
-                    document.body.appendChild(confetti);
-                }
-                
-                // 5秒后清除所有纸屑
-                setTimeout(() => {
-                    const confettiElements = document.querySelectorAll('.confetti');
-                    confettiElements.forEach(el => el.remove());
-                }, 5000);
-            }
-            
-            // 旋转老虎机
-            function spinSlotMachine() {
-                if (isSpinning) return;
-                
-                isSpinning = true;
-                spinButton.disabled = true;
-                resultContainer.style.display = 'none';
-                
-                // 根据是否特殊日期调整概率
-                const isSpecial = isSpecialDay();
-                let adjustedItems = [...foodItems];
-                
-                if (isSpecial) {
-                    holidayMode.style.display = 'inline-block';
-                    // 特殊日期增加大餐概率（重复添加大餐类型）
-                    foodItems.forEach(item => {
-                        if (item.type === "大餐") {
-                            adjustedItems.push(item);
-                            adjustedItems.push(item);
-                        }
-                    });
-                } else {
-                    holidayMode.style.display = 'none';
-                }
-                
-                // 随机选择食物
-                const randomIndex = Math.floor(Math.random() * adjustedItems.length);
-                const selectedFood = adjustedItems[randomIndex];
-                
-                // 计算每个滚轮需要停止的位置
-                const itemHeight = 100; // 每个选项的高度
-                const itemsPerReel = foodItems.length;
-                const totalHeight = itemsPerReel * itemHeight;
-                
-                // 每个滚轮稍微不同的停止位置，增加随机感
-                reels.forEach((reel, index) => {
-                    // 找到选中食物在列表中的位置
-                    const foodPosition = foodItems.findIndex(item => item.name === selectedFood.name);
-                    
-                    // 计算停止位置（中间位置）
-                    // 确保停止位置正好使选中食物在中间
-                    const stopPosition = -(foodPosition * itemHeight + (index * 35) + 2 * totalHeight);
-                    
-                    // 重置位置到顶部，确保动画流畅
-                    reel.element.style.transition = 'none';
-                    reel.element.style.top = '0px';
-                    
-                    // 强制重绘
-                    reel.element.offsetHeight;
-                    
-                    // 设置动画
-                    reel.element.style.transition = `top 3s cubic-bezier(0.${2+index}, 0.${index}, 0.${8-index}, 1)`;
-                    reel.element.style.top = `${stopPosition}px`;
-                    
-                    // 更新位置
-                    reel.position = stopPosition;
-                });
-                
-                // 显示结果
-                setTimeout(() => {
-                    resultContent.textContent = `${selectedFood.emoji} ${selectedFood.name}`;
-                    resultContainer.style.display = 'block';
-                    isSpinning = false;
-                    spinButton.disabled = false;
-                    
-                    // 如果是大餐，添加庆祝效果
-                    if (selectedFood.type === "大餐") {
-                        createConfetti();
+        }
+
+        function createFoodTags(){
+            foodItemsContainer.innerHTML='';
+            foodItems.forEach(item=>{
+                const tag=document.createElement('div');
+                tag.className=`food-tag ${item.type==='大餐'?'special':''}`;
+                tag.innerHTML=`${item.emoji} ${item.name}`;
+                tag.title=item.type;
+                foodItemsContainer.appendChild(tag);
+            });
+        }
+
+        function spinSlotMachine(){
+            if(isSpinning) return;
+            isSpinning = true;
+            spinButton.disabled = true;
+            resultContainer.style.display = 'none';
+
+            const randomIndex = Math.floor(Math.random() * foodItems.length);
+            const selectedFood = foodItems[randomIndex];
+
+            debugInfo.innerHTML = `选中: ${selectedFood.name}`;
+            debugInfo.style.display = 'block';
+
+            const itemHeight = 100;
+            const itemsPerReel = foodItems.length;
+
+            reels.forEach((reel, reelIndex) => {
+                const foodPosition = foodItems.findIndex(item => item.name === selectedFood.name);
+                const stopPosition = -(foodPosition * itemHeight + 2 * itemsPerReel * itemHeight);
+
+                // 先重置
+                reel.element.style.transition = 'none';
+                reel.element.style.top = '0px';
+                void reel.element.offsetHeight;
+
+                // 设置动画
+                reel.element.style.transition = `top ${3 + reelIndex * 0.5}s cubic-bezier(0.25,0.1,0.25,1)`;
+                reel.element.style.top = stopPosition + 'px';
+
+                // 动画结束监听
+                reel.element.addEventListener('transitionend', function handler() {
+                    reel.element.removeEventListener('transitionend', handler);
+                    if (reelIndex === reels.length - 1) { // 最后一个滚轮停下时
+                        resultContent.textContent = selectedFood.emoji + " " + selectedFood.name;
+                        resultContainer.style.display = 'block';
+                        spinButton.disabled = false;
+                        isSpinning = false;
+                        debugInfo.style.display = 'none';
                     }
-                }, 3500);
-            }
-            
-            // 初始化老虎机和标签
-            createSlotMachine();
-            createFoodTags();
-            
-            // 检查是否是特殊日期
-            if (isSpecialDay()) {
-                holidayMode.style.display = 'inline-block';
-            }
-            
-            // 添加事件监听
-            spinButton.addEventListener('click', spinSlotMachine);
-        });
-    </script>
-</body>
-</html>
+                });
+            });
+        }
+
+        // 初始化
+        createSlotMachine();
+        createFoodTags();
+        spinButton.addEventListener('click', spinSlotMachine);
+
+        // 日期显示
+        const dateDisplay = document.getElementById('dateDisplay');
+        const today = new Date();
+        dateDisplay.textContent = today.toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric',weekday:'long'});
+    });
+</script>
