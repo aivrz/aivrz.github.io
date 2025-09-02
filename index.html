@@ -447,47 +447,48 @@
                 });
             }
 
-            function spinSlotMachine(){
-                if(isSpinning) return;
-                isSpinning = true;
-                spinButton.disabled = true;
-                resultContainer.style.display = 'none';
+           function spinSlotMachine(){
+    if(isSpinning) return;
+    isSpinning = true;
+    spinButton.disabled = true;
+    resultContainer.style.display = 'none';
 
-                const randomIndex = Math.floor(Math.random() * foodItems.length);
-                const selectedFood = foodItems[randomIndex];
+    const randomIndex = Math.floor(Math.random() * foodItems.length);
+    const selectedFood = foodItems[randomIndex];
 
-                debugInfo.innerHTML = `选中: ${selectedFood.name}`;
-                debugInfo.style.display = 'block';
+    debugInfo.innerHTML = `选中: ${selectedFood.name}`;
+    debugInfo.style.display = 'block';
 
-                const itemHeight = 100;
-                const itemsPerReel = foodItems.length;
+    const itemHeight = 100;
+    const itemsPerReel = foodItems.length;
 
-                reels.forEach((reel, reelIndex) => {
-                    const foodPosition = foodItems.findIndex(item => item.name === selectedFood.name);
-                    const stopPosition = -(foodPosition * itemHeight + 2 * itemsPerReel * itemHeight);
+    reels.forEach((reel, reelIndex) => {
+        const foodPosition = foodItems.findIndex(item => item.name === selectedFood.name);
+        const middleOffset = itemHeight; // 让选中格在中间
+        const stopPosition = -(foodPosition * itemHeight + 2 * itemsPerReel * itemHeight - middleOffset);
 
-                    // 先重置
-                    reel.element.style.transition = 'none';
-                    reel.element.style.top = '0px';
-                    void reel.element.offsetHeight;
+        // 先重置
+        reel.element.style.transition = 'none';
+        reel.element.style.top = '0px';
+        void reel.element.offsetHeight;
 
-                    // 设置动画
-                    reel.element.style.transition = `top ${3 + reelIndex * 0.5}s cubic-bezier(0.25,0.1,0.25,1)`;
-                    reel.element.style.top = stopPosition + 'px';
+        // 设置动画
+        reel.element.style.transition = `top ${3 + reelIndex * 0.5}s cubic-bezier(0.25,0.1,0.25,1)`;
+        reel.element.style.top = stopPosition + 'px';
 
-                    // 动画结束监听
-                    reel.element.addEventListener('transitionend', function handler() {
-                        reel.element.removeEventListener('transitionend', handler);
-                        if (reelIndex === reels.length - 1) { // 最后一个滚轮停下时
-                            resultContent.textContent = selectedFood.emoji + " " + selectedFood.name;
-                            resultContainer.style.display = 'block';
-                            spinButton.disabled = false;
-                            isSpinning = false;
-                            debugInfo.style.display = 'none';
-                        }
-                    });
-                });
+        // 动画结束监听
+        reel.element.addEventListener('transitionend', function handler() {
+            reel.element.removeEventListener('transitionend', handler);
+            if (reelIndex === reels.length - 1) { // 最后一个滚轮停下时
+                resultContent.textContent = selectedFood.emoji + " " + selectedFood.name;
+                resultContainer.style.display = 'block';
+                spinButton.disabled = false;
+                isSpinning = false;
+                debugInfo.style.display = 'none';
             }
+        });
+    });
+}
 
             // 初始化
             createSlotMachine();
