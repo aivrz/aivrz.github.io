@@ -47,18 +47,185 @@
         .floating-qr { position:fixed; bottom:20px; right:20px; width:90px; height:100px; background:white; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.2); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; z-index:999; }
         .floating-qr img { width:70px; height:70px; margin-bottom:5px; }
         .floating-qr-text { font-size:0.75rem; color:#333; text-align:center; }
+        
+        /* 分享按钮容器 */
+        .share-buttons-container {
+            margin-top: 25px;
+            width: 100%;
+        }
+        
         /* 分享按钮 */
-.share-buttons { display:flex; justify-content:center; gap:10px; margin-top:15px; }
-.share-btn { border:none; border-radius:25px; padding:8px 15px; cursor:pointer; color:white; font-size:0.9rem; display:flex; align-items:center; gap:5px; }
-.share-btn.wechat { background:#1AAD19; }
-.share-btn.qq { background:#12B7F5; }
-.share-btn.weibo { background:#E6162D; }
-.share-btn.douyin { background:#000; }
-
-/* 二维码放大遮罩 */
-.qr-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:1000; }
-.qr-modal-content img { width:250px; height:250px; border-radius:15px; box-shadow:0 5px 20px rgba(0,0,0,0.3); }
-
+        .share-buttons { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            margin-top: 15px; 
+            flex-wrap: wrap;
+        }
+        
+        .share-btn { 
+            border: none; 
+            border-radius: 50px; 
+            padding: 12px 20px; 
+            cursor: pointer; 
+            color: white; 
+            font-size: 1rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+        }
+        
+        .share-btn.wechat { background: linear-gradient(to right, #1AAD19, #0F9D0F); }
+        .share-btn.qq { background: linear-gradient(to right, #12B7F5, #0A9BDC); }
+        .share-btn.weibo { background: linear-gradient(to right, #E6162D, #C41429); }
+        .share-btn.douyin { background: linear-gradient(to right, #000, #333); }
+        .share-btn.copy-link { background: linear-gradient(to right, #9b59b6, #8e44ad); }
+        .share-btn.qr-code { background: linear-gradient(to right, #3498db, #2980b9); }
+        
+        /* 分享提示文本 */
+        .share-hint {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        /* 二维码弹窗 */
+        .qr-modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.85); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+            flex-direction: column;
+        }
+        
+        .qr-modal-content { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            max-width: 90%;
+        }
+        
+        .qr-modal-content img { 
+            width: 250px; 
+            height: 250px; 
+            border-radius: 10px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+        }
+        
+        .qr-modal-close {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .qr-modal-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .share-btn {
+                padding: 15px 20px;
+                font-size: 1.1rem;
+            }
+            
+            .desktop-only {
+                display: none !important;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-only {
+                display: none !important;
+            }
+        }
+        
+        /* 提示工具 */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 140px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -70px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* 复制成功提示 */
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1001;
+            animation: fadeInOut 2s forwards;
+            display: none;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; top: 10px; }
+            20% { opacity: 1; top: 20px; }
+            80% { opacity: 1; top: 20px; }
+            100% { opacity: 0; top: 10px; display: none; }
+        }
     </style>
 </head>
 <body>
@@ -87,6 +254,32 @@
             <div class="food-list-title">美食清单</div>
             <div class="food-items" id="foodItems"></div>
         </div>
+        
+        <!-- 分享按钮容器 -->
+        <div class="share-buttons-container">
+            <div class="share-hint" id="shareHint">分享美食，传递快乐~</div>
+            <div class="share-buttons" id="shareButtons">
+                <!-- 移动端分享按钮 -->
+                <div class="mobile-only">
+                    <button class="share-btn wechat"><i class="fab fa-weixin"></i> 微信</button>
+                    <button class="share-btn qq"><i class="fab fa-qq"></i> QQ</button>
+                    <button class="share-btn weibo"><i class="fab fa-weibo"></i> 微博</button>
+                    <button class="share-btn douyin"><i class="fas fa-music"></i> 抖音</button>
+                </div>
+                
+                <!-- 电脑端分享按钮 -->
+                <div class="desktop-only">
+                    <button class="share-btn qr-code tooltip" id="showQrBtn">
+                        <i class="fas fa-qrcode"></i> 二维码
+                        <span class="tooltiptext">显示页面二维码</span>
+                    </button>
+                    <button class="share-btn copy-link tooltip" id="copyLinkBtn">
+                        <i class="fas fa-link"></i> 复制链接
+                        <span class="tooltiptext">复制页面链接</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
     <footer>© 2023 美食老虎机 - 解决您的选择困难症</footer>
     <div class="debug-info" id="debugInfo"></div>
@@ -96,152 +289,220 @@
         <img src="https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg" alt="领券二维码">
         <div class="floating-qr-text">领券</div>
     </div>
-    <!-- 结果区下方加分享按钮 -->
-<div class="share-buttons">
-  <button class="share-btn wechat"><i class="fab fa-weixin"></i> 微信</button>
-  <button class="share-btn qq"><i class="fab fa-qq"></i> QQ</button>
-  <button class="share-btn weibo"><i class="fab fa-weibo"></i> 微博</button>
-  <button class="share-btn douyin"><i class="fas fa-music"></i> 抖音</button>
-</div>
 
-<!-- 放大二维码遮罩层 -->
-<div class="qr-modal" id="qrModal">
-  <div class="qr-modal-content">
-    <img src="https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg" alt="二维码大图">
-  </div>
-</div>
+    <!-- 二维码弹窗 -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-modal-content">
+            <div class="qr-modal-title">扫描二维码分享页面</div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentURL)}" alt="页面二维码">
+            <button class="qr-modal-close" id="closeQrModal">关闭</button>
+        </div>
+    </div>
 
+    <!-- 复制成功提示 -->
+    <div class="copy-success" id="copySuccess">
+        <i class="fas fa-check-circle"></i> 链接已复制到剪贴板！
+    </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function(){
-        const foodItems=[
-            { name:"火锅", type:"大餐", color:"#e74c3c", emoji:"🍲" },
-            { name:"披萨", type:"西餐", color:"#3498db", emoji:"🍕" },
-            { name:"寿司", type:"日料", color:"#2ecc71", emoji:"🍣" },
-            { name:"烧烤", type:"大餐", color:"#f39c12", emoji:"🍢" },
-            { name:"炸鸡", type:"快餐", color:"#9b59b6", emoji:"🍗" },
-            { name:"拉面", type:"面食", color:"#1abc9c", emoji:"🍜" },
-            { name:"炒饭", type:"主食", color:"#d35400", emoji:"🍚" },
-            { name:"沙拉", type:"轻食", color:"#27ae60", emoji:"🥗" },
-            { name:"汉堡", type:"快餐", color:"#8e44ad", emoji:"🍔" },
-            { name:"牛排", type:"西餐", color:"#c0392b", emoji:"🥩" },
-            { name:"饺子", type:"中餐", color:"#16a085", emoji:"🥟" },
-            { name:"咖喱", type:"亚洲", color:"#e67e22", emoji:"🍛" },
-            { name:"砂锅", type:"中餐", color:"#8e44ad", emoji:"🥘" },
-            { name:"盖饭", type:"主食", color:"#f1c40f", emoji:"🍛" },
-            { name:"凉皮", type:"小吃", color:"#27ae60", emoji:"🍝" },
-            { name:"酸辣粉", type:"小吃", color:"#e67e22", emoji:"🍜" },
-            { name:"螺蛳粉", type:"小吃", color:"#16a085", emoji:"🍲" },
-            { name:"热干面", type:"面食", color:"#f39c12", emoji:"🍜" },
-            { name:"烩面", type:"面食", color:"#d35400", emoji:"🍜" },
-            { name:"麻辣烫", type:"小吃", color:"#c0392b", emoji:"🍲" },
-            { name:"自助餐", type:"大餐", color:"#9b59b6", emoji:"🍽️" },
-            { name:"烤肉", type:"大餐", color:"#e74c3c", emoji:"🍖" }
-        ];
-        const reelsContainer=document.getElementById('reelsContainer');
-        const spinButton=document.getElementById('spinButton');
-        const resultContainer=document.getElementById('resultContainer');
-        const resultContent=document.getElementById('resultContent');
-        const foodItemsContainer=document.getElementById('foodItems');
-        const debugInfo=document.getElementById('debugInfo');
-        let isSpinning=false; let reels=[];
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const foodItems=[
+                { name:"火锅", type:"大餐", color:"#e74c3c", emoji:"🍲" },
+                { name:"披萨", type:"西餐", color:"#3498db", emoji:"🍕" },
+                { name:"寿司", type:"日料", color:"#2ecc71", emoji:"🍣" },
+                { name:"烧烤", type:"大餐", color:"#f39c12", emoji:"🍢" },
+                { name:"炸鸡", type:"快餐", color:"#9b59b6", emoji:"🍗" },
+                { name:"拉面", type:"面食", color:"#1abc9c", emoji:"🍜" },
+                { name:"炒饭", type:"主食", color:"#d35400", emoji:"🍚" },
+                { name:"沙拉", type:"轻食", color:"#27ae60", emoji:"🥗" },
+                { name:"汉堡", type:"快餐", color:"#8e44ad", emoji:"🍔" },
+                { name:"牛排", type:"西餐", color:"#c0392b", emoji:"🥩" },
+                { name:"饺子", type:"中餐", color:"#16a085", emoji:"🥟" },
+                { name:"咖喱", type:"亚洲", color:"#e67e22", emoji:"🍛" },
+                { name:"砂锅", type:"中餐", color:"#8e44ad", emoji:"🥘" },
+                { name:"盖饭", type:"主食", color:"#f1c40f", emoji:"🍛" },
+                { name:"凉皮", type:"小吃", color:"#27ae60", emoji:"🍝" },
+                { name:"酸辣粉", type:"小吃", color:"#e67e22", emoji:"🍜" },
+                { name:"螺蛳粉", type:"小吃", color:"#16a085", emoji:"🍲" },
+                { name:"热干面", type:"面食", color:"#f39c12", emoji:"🍜" },
+                { name:"烩面", type:"面食", color:"#d35400", emoji:"🍜" },
+                { name:"麻辣烫", type:"小吃", color:"#c0392b", emoji:"🍲" },
+                { name:"自助餐", type:"大餐", color:"#9b59b6", emoji:"🍽️" },
+                { name:"烤肉", type:"大餐", color:"#e74c3c", emoji:"🍖" }
+            ];
+            const reelsContainer=document.getElementById('reelsContainer');
+            const spinButton=document.getElementById('spinButton');
+            const resultContainer=document.getElementById('resultContainer');
+            const resultContent=document.getElementById('resultContent');
+            const foodItemsContainer=document.getElementById('foodItems');
+            const debugInfo=document.getElementById('debugInfo');
+            let isSpinning=false; let reels=[];
 
-        // 悬浮二维码放大
-const floatingQr = document.querySelector('.floating-qr');
-const qrModal = document.getElementById('qrModal');
+            // 悬浮二维码放大
+            const floatingQr = document.querySelector('.floating-qr');
+            const qrModal = document.getElementById('qrModal');
 
-floatingQr.addEventListener('click', ()=>{ qrModal.style.display='flex'; });
-qrModal.addEventListener('click', ()=>{ qrModal.style.display='none'; });
+            floatingQr.addEventListener('click', ()=>{ qrModal.style.display='flex'; });
+            qrModal.addEventListener('click', ()=>{ qrModal.style.display='none'; });
 
-// 分享按钮
-document.querySelectorAll('.share-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    alert("分享功能待接入，可复制链接或截图分享哦~");
-  });
-});
-
-        function createSlotMachine(){
-            reelsContainer.innerHTML=''; reels=[];
-            for(let i=0;i<3;i++){
-                const reel=document.createElement('div'); reel.className='reel';
-                const reelInner=document.createElement('div'); reelInner.className='reel-inner'; reelInner.id=`reel-${i}`;
-                for(let j=0;j<3;j++){
-                    foodItems.forEach((item,index)=>{
-                        const reelItem=document.createElement('div');
-                        reelItem.className=`reel-item ${item.type==='大餐'?'special':''}`;
-                        reelItem.style.backgroundColor=item.color;
-                        reelItem.textContent=item.emoji;
-                        reelItem.setAttribute('data-name',item.name);
-                        reelInner.appendChild(reelItem);
+            // 设备检测函数
+            function isMobileDevice() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            }
+            
+            // 更新分享提示文本
+            function updateShareHint() {
+                const shareHint = document.getElementById('shareHint');
+                if (isMobileDevice()) {
+                    shareHint.textContent = '分享到社交平台';
+                } else {
+                    shareHint.textContent = '分享本页面给朋友';
+                }
+            }
+            
+            // 初始化分享功能
+            function initShareFunctions() {
+                const showQrBtn = document.getElementById('showQrBtn');
+                const closeQrModal = document.getElementById('closeQrModal');
+                const qrModal = document.getElementById('qrModal');
+                const copyLinkBtn = document.getElementById('copyLinkBtn');
+                const copySuccess = document.getElementById('copySuccess');
+                
+                // 显示二维码弹窗
+                if (showQrBtn) {
+                    showQrBtn.addEventListener('click', function() {
+                        qrModal.style.display = 'flex';
                     });
                 }
-                const reelGlass=document.createElement('div'); reelGlass.className='reel-glass';
-                reel.appendChild(reelInner); reel.appendChild(reelGlass); reelsContainer.appendChild(reel);
-                reels.push({element:reelInner,position:0,id:i});
-            }
-        }
-
-        function createFoodTags(){
-            foodItemsContainer.innerHTML='';
-            foodItems.forEach(item=>{
-                const tag=document.createElement('div');
-                tag.className=`food-tag ${item.type==='大餐'?'special':''}`;
-                tag.innerHTML=`${item.emoji} ${item.name}`;
-                tag.title=item.type;
-                foodItemsContainer.appendChild(tag);
-            });
-        }
-
-        function spinSlotMachine(){
-            if(isSpinning) return;
-            isSpinning = true;
-            spinButton.disabled = true;
-            resultContainer.style.display = 'none';
-
-            const randomIndex = Math.floor(Math.random() * foodItems.length);
-            const selectedFood = foodItems[randomIndex];
-
-            debugInfo.innerHTML = `选中: ${selectedFood.name}`;
-            debugInfo.style.display = 'block';
-
-            const itemHeight = 100;
-            const itemsPerReel = foodItems.length;
-
-            reels.forEach((reel, reelIndex) => {
-                const foodPosition = foodItems.findIndex(item => item.name === selectedFood.name);
-                const stopPosition = -(foodPosition * itemHeight + 2 * itemsPerReel * itemHeight);
-
-                // 先重置
-                reel.element.style.transition = 'none';
-                reel.element.style.top = '0px';
-                void reel.element.offsetHeight;
-
-                // 设置动画
-                reel.element.style.transition = `top ${3 + reelIndex * 0.5}s cubic-bezier(0.25,0.1,0.25,1)`;
-                reel.element.style.top = stopPosition + 'px';
-
-                // 动画结束监听
-                reel.element.addEventListener('transitionend', function handler() {
-                    reel.element.removeEventListener('transitionend', handler);
-                    if (reelIndex === reels.length - 1) { // 最后一个滚轮停下时
-                        resultContent.textContent = selectedFood.emoji + " " + selectedFood.name;
-                        resultContainer.style.display = 'block';
-                        spinButton.disabled = false;
-                        isSpinning = false;
-                        debugInfo.style.display = 'none';
+                
+                // 关闭二维码弹窗
+                if (closeQrModal) {
+                    closeQrModal.addEventListener('click', function() {
+                        qrModal.style.display = 'none';
+                    });
+                }
+                
+                // 点击弹窗背景关闭
+                qrModal.addEventListener('click', function(e) {
+                    if (e.target === qrModal) {
+                        qrModal.style.display = 'none';
                     }
                 });
-            });
-        }
+                
+                // 复制链接功能
+                if (copyLinkBtn) {
+                    copyLinkBtn.addEventListener('click', function() {
+                        const url = window.location.href;
+                        navigator.clipboard.writeText(url).then(function() {
+                            // 显示成功提示
+                            copySuccess.style.display = 'block';
+                            setTimeout(function() {
+                                copySuccess.style.display = 'none';
+                            }, 2000);
+                        }).catch(function(err) {
+                            console.error('无法复制链接: ', err);
+                            alert('复制失败，请手动复制链接: ' + url);
+                        });
+                    });
+                }
+                
+                // 移动端分享按钮事件
+                document.querySelectorAll('.mobile-only .share-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const platform = this.textContent.trim();
+                        alert(`即将分享到${platform}，功能待接入\n您可以先截图分享哦~`);
+                    });
+                });
+            }
 
-        // 初始化
-        createSlotMachine();
-        createFoodTags();
-        spinButton.addEventListener('click', spinSlotMachine);
+            function createSlotMachine(){
+                reelsContainer.innerHTML=''; reels=[];
+                for(let i=0;i<3;i++){
+                    const reel=document.createElement('div'); reel.className='reel';
+                    const reelInner=document.createElement('div'); reelInner.className='reel-inner'; reelInner.id=`reel-${i}`;
+                    for(let j=0;j<3;j++){
+                        foodItems.forEach((item,index)=>{
+                            const reelItem=document.createElement('div');
+                            reelItem.className=`reel-item ${item.type==='大餐'?'special':''}`;
+                            reelItem.style.backgroundColor=item.color;
+                            reelItem.textContent=item.emoji;
+                            reelItem.setAttribute('data-name',item.name);
+                            reelInner.appendChild(reelItem);
+                        });
+                    }
+                    const reelGlass=document.createElement('div'); reelGlass.className='reel-glass';
+                    reel.appendChild(reelInner); reel.appendChild(reelGlass); reelsContainer.appendChild(reel);
+                    reels.push({element:reelInner,position:0,id:i});
+                }
+            }
 
-        // 日期显示
-        const dateDisplay = document.getElementById('dateDisplay');
-        const today = new Date();
-        dateDisplay.textContent = today.toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric',weekday:'long'});
-    });
-</script>
+            function createFoodTags(){
+                foodItemsContainer.innerHTML='';
+                foodItems.forEach(item=>{
+                    const tag=document.createElement('div');
+                    tag.className=`food-tag ${item.type==='大餐'?'special':''}`;
+                    tag.innerHTML=`${item.emoji} ${item.name}`;
+                    tag.title=item.type;
+                    foodItemsContainer.appendChild(tag);
+                });
+            }
+
+            function spinSlotMachine(){
+                if(isSpinning) return;
+                isSpinning = true;
+                spinButton.disabled = true;
+                resultContainer.style.display = 'none';
+
+                const randomIndex = Math.floor(Math.random() * foodItems.length);
+                const selectedFood = foodItems[randomIndex];
+
+                debugInfo.innerHTML = `选中: ${selectedFood.name}`;
+                debugInfo.style.display = 'block';
+
+                const itemHeight = 100;
+                const itemsPerReel = foodItems.length;
+
+                reels.forEach((reel, reelIndex) => {
+                    const foodPosition = foodItems.findIndex(item => item.name === selectedFood.name);
+                    const stopPosition = -(foodPosition * itemHeight + 2 * itemsPerReel * itemHeight);
+
+                    // 先重置
+                    reel.element.style.transition = 'none';
+                    reel.element.style.top = '0px';
+                    void reel.element.offsetHeight;
+
+                    // 设置动画
+                    reel.element.style.transition = `top ${3 + reelIndex * 0.5}s cubic-bezier(0.25,0.1,0.25,1)`;
+                    reel.element.style.top = stopPosition + 'px';
+
+                    // 动画结束监听
+                    reel.element.addEventListener('transitionend', function handler() {
+                        reel.element.removeEventListener('transitionend', handler);
+                        if (reelIndex === reels.length - 1) { // 最后一个滚轮停下时
+                            resultContent.textContent = selectedFood.emoji + " " + selectedFood.name;
+                            resultContainer.style.display = 'block';
+                            spinButton.disabled = false;
+                            isSpinning = false;
+                            debugInfo.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // 初始化
+            createSlotMachine();
+            createFoodTags();
+            spinButton.addEventListener('click', spinSlotMachine);
+
+            // 日期显示
+            const dateDisplay = document.getElementById('dateDisplay');
+            const today = new Date();
+            dateDisplay.textContent = today.toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric',weekday:'long'});
+            
+            // 初始化分享功能
+            updateShareHint();
+            initShareFunctions();
+        });
+    </script>
+</body>
+</html>
