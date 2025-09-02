@@ -88,6 +88,27 @@
         .share-btn.douyin { background: linear-gradient(to right, #000, #333); }
         .share-btn.copy-link { background: linear-gradient(to right, #9b59b6, #8e44ad); }
         .share-btn.qr-code { background: linear-gradient(to right, #3498db, #2980b9); }
+
+        @media (max-width: 768px) {
+    .mobile-only {
+        display: flex !important;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 0;
+    }
+    .mobile-only .share-btn {
+        padding: 15px;
+        min-width: 48px;
+        min-height: 48px;
+        font-size: 1.7rem;
+        justify-content: center;
+        border-radius: 50%;
+        aspect-ratio: 1/1;
+    }
+    .mobile-only .share-btn i {
+        margin: 0;
+    }
+}
         
         /* 分享提示文本 */
         .share-hint {
@@ -257,29 +278,28 @@
         
         <!-- 分享按钮容器 -->
         <div class="share-buttons-container">
-            <div class="share-hint" id="shareHint">分享美食，传递快乐~</div>
-            <div class="share-buttons" id="shareButtons">
-                <!-- 移动端分享按钮 -->
-                <div class="mobile-only">
-                    <button class="share-btn wechat"><i class="fab fa-weixin"></i> 微信</button>
-                    <button class="share-btn qq"><i class="fab fa-qq"></i> QQ</button>
-                    <button class="share-btn weibo"><i class="fab fa-weibo"></i> 微博</button>
-                    <button class="share-btn douyin"><i class="fas fa-music"></i> 抖音</button>
-                </div>
-                
-                <!-- 电脑端分享按钮 -->
-                <div class="desktop-only">
-                    <button class="share-btn qr-code tooltip" id="showQrBtn">
-                        <i class="fas fa-qrcode"></i> 二维码
-                        <span class="tooltiptext">显示页面二维码</span>
-                    </button>
-                    <button class="share-btn copy-link tooltip" id="copyLinkBtn">
-                        <i class="fas fa-link"></i> 复制链接
-                        <span class="tooltiptext">复制页面链接</span>
-                    </button>
-                </div>
-            </div>
+    <div class="share-hint" id="shareHint">分享美食，传递快乐~</div>
+    <div class="share-buttons" id="shareButtons">
+        <!-- 移动端分享按钮（仅图标，一排显示） -->
+        <div class="mobile-only">
+            <button class="share-btn wechat" title="微信"><i class="fab fa-weixin"></i></button>
+            <button class="share-btn qq" title="QQ"><i class="fab fa-qq"></i></button>
+            <button class="share-btn weibo" title="微博"><i class="fab fa-weibo"></i></button>
+            <button class="share-btn douyin" title="抖音"><i class="fas fa-music"></i></button>
         </div>
+        <!-- 电脑端分享按钮 -->
+        <div class="desktop-only">
+            <button class="share-btn qr-code tooltip" id="showQrBtn">
+                <i class="fas fa-qrcode"></i> 二维码
+                <span class="tooltiptext">显示页面二维码</span>
+            </button>
+            <button class="share-btn copy-link tooltip" id="copyLinkBtn">
+                <i class="fas fa-link"></i> 复制链接
+                <span class="tooltiptext">复制页面链接</span>
+            </button>
+        </div>
+    </div>
+</div>
     </div>
     <footer>© 2023-现在 美食老虎机 - 解决您的选择困难症</footer>
     <div class="debug-info" id="debugInfo"></div>
