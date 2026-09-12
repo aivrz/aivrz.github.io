@@ -3,540 +3,674 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>美食老虎机 - 今天吃什么</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>今天吃啥 · 决策游戏合集</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Microsoft YaHei', sans-serif; }
-        body { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; overflow-x: hidden; position: relative; }
-        .container { max-width: 900px; width: 100%; text-align: center; z-index: 1; }
-        header { margin-bottom: 30px; position: relative; }
-        h1 { color: #d35400; font-size: 2.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); margin-bottom: 10px; position: relative; display: inline-block; }
-        h1::after { content:''; position: absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:100px; height:4px; background:linear-gradient(to right,#e74c3c,#f39c12); border-radius:2px; }
-        .date-display { color:#7f8c8d; font-size:1.2rem; margin-bottom:20px; background:rgba(255,255,255,0.8); padding:8px 15px; border-radius:20px; display:inline-block; box-shadow:0 3px 10px rgba(0,0,0,0.1); }
-        .holiday-mode { background:linear-gradient(to right,#e74c3c,#f39c12); color:white; padding:8px 15px; border-radius:20px; margin-top:10px; display:inline-block; animation:pulse 2s infinite; }
-        @keyframes pulse { 0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);} }
-        .slot-machine { background:linear-gradient(135deg,#2c3e50,#4a69bd); border-radius:20px; padding:30px; box-shadow:0 15px 35px rgba(0,0,0,0.3); margin-bottom:30px; position:relative; overflow:hidden; border:5px solid #f39c12; }
-        .reels-container { display:flex; justify-content:center; gap:15px; margin-bottom:30px; perspective:1000px; position:relative; }
-        .reel { width:120px; height:300px; background:white; border-radius:10px; overflow:hidden; position:relative; box-shadow:inset 0 0 15px rgba(0,0,0,0.3),0 5px 15px rgba(0,0,0,0.3); transform-style:preserve-3d; }
-        .reel-inner { position:absolute; width:100%; top:0; transition: top 4s cubic-bezier(0.17,0.67,0.83,0.67); }
-        .reel-item { height:100px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; font-weight:bold; color:white; text-shadow:1px 1px 2px rgba(0,0,0,0.5); }
-        .reel-item.special { background:linear-gradient(135deg,#e74c3c,#f39c12); }
-        .reel-glass { position:absolute; top:0; left:0; right:0; bottom:0; background:linear-gradient(125deg,rgba(255,255,255,0.3) 0%,rgba(255,255,255,0.1) 40%,rgba(255,255,255,0.1) 60%,rgba(255,255,255,0.3) 100%); pointer-events:none; border-radius:10px; }
-        .slot-middle { position:absolute; top:37%; left:15px; right:15px; height:100px; border-top:3px dashed #e74c3c; border-bottom:3px dashed #e74c3c; transform:translateY(-50%); pointer-events:none; z-index:10; box-sizing:border-box; }
-        .controls { display:flex; flex-direction:column; align-items:center; }
-        .spin-button { background:linear-gradient(to right,#e74c3c,#f39c12); color:white; border:none; padding:18px 50px; font-size:1.4rem; border-radius:50px; cursor:pointer; transition:all 0.3s; box-shadow:0 8px 20px rgba(231,76,60,0.5); margin-bottom:30px; position:relative; overflow:hidden; }
-        .spin-button:hover { transform:translateY(-3px); box-shadow:0 12px 25px rgba(231,76,60,0.6); }
-        .spin-button:disabled { background:#bdc3c7; cursor:not-allowed; transform:none; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
-        .result-container { background:white; border-radius:20px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.15); margin-bottom:30px; width:100%; display:none; animation:fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
-        .result-title { color:#e74c3c; font-size:1.8rem; margin-bottom:15px; position:relative; display:inline-block; }
-        .result-title::after { content:''; position:absolute; bottom:-5px; left:50%; transform:translateX(-50%); width:50px; height:3px; background:linear-gradient(to right,#e74c3c,#f39c12); border-radius:2px; }
-        .result-content { display:flex; justify-content:center; gap:20px; font-size:2.2rem; color:#d35400; font-weight:bold; margin-bottom:25px; text-shadow:1px 1px 2px rgba(0,0,0,0.1); padding:10px; background:linear-gradient(135deg,#fff4e6 0%,#ffeaa7 100%); border-radius:15px; border:2px dashed #f39c12; }
-        .result-item { display:flex; flex-direction:column; align-items:center; }
-        .qr-code { background:#f5f5f5; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1); padding:15px; }
-        .qr-code img { width:130px; height:130px; margin-bottom:10px; }
-        .qr-code-text { font-size:0.9rem; color:#7f8c8d; text-align:center; }
-        .food-list { background:white; border-radius:20px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.15); width:100%; max-height:300px; overflow-y:auto; margin-top:20px; }
-        .food-list-title { color:#e74c3c; font-size:1.5rem; margin-bottom:15px; text-align:left; padding-bottom:10px; border-bottom:2px solid #ffeaa7; position:sticky; top:0; background:white; z-index:1; }
-        .food-items { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
-        .food-tag { background:linear-gradient(to right,#74b9ff,#0984e3); color:white; padding:8px 15px; border-radius:20px; font-size:0.9rem; box-shadow:0 3px 10px rgba(0,0,0,0.1); }
-        .food-tag.special { background:linear-gradient(to right,#e74c3c,#f39c12); }
-        footer { margin-top:30px; color:#7f8c8d; font-size:0.9rem; padding:20px; text-align:center; }
-        .debug-info { background:rgba(0,0,0,0.8); color:white; padding:10px; border-radius:5px; position:fixed; bottom:10px; right:10px; font-size:12px; display:none; }
-        /* 悬浮二维码角标 */
-        .floating-qr { position:fixed; bottom:20px; right:20px; width:90px; height:100px; background:white; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.2); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; z-index:999; }
-        .floating-qr img { width:70px; height:70px; margin-bottom:5px; }
-        .floating-qr-text { font-size:0.75rem; color:#333; text-align:center; }
-        
-        /* 分享按钮容器 */
-        .share-buttons-container {
-            margin-top: 25px;
-            width: 100%;
-        }
-        
-        /* 分享按钮 */
-        .share-buttons { 
-            display: flex; 
-            justify-content: center; 
-            gap: 15px; 
-            margin-top: 15px; 
-            flex-wrap: wrap;
-        }
-        
-        .share-btn { 
-            border: none; 
-            border-radius: 50px; 
-            padding: 12px 20px; 
-            cursor: pointer; 
-            color: white; 
-            font-size: 1rem; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            transition: all 0.3s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        .share-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
-        }
-        
-        .share-btn.wechat { background: linear-gradient(to right, #1AAD19, #0F9D0F); }
-        .share-btn.qq { background: linear-gradient(to right, #12B7F5, #0A9BDC); }
-        .share-btn.weibo { background: linear-gradient(to right, #E6162D, #C41429); }
-        .share-btn.douyin { background: linear-gradient(to right, #000, #333); }
-        .share-btn.copy-link { background: linear-gradient(to right, #9b59b6, #8e44ad); }
-        .share-btn.qr-code { background: linear-gradient(to right, #3498db, #2980b9); }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Microsoft YaHei','PingFang SC',sans-serif; }
+        body { background:linear-gradient(135deg,#ff9a9e 0%,#fad0c4 100%); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:18px 18px 86px; overflow-x:hidden; color:#2c3e50; }
+        .container { max-width:920px; width:100%; text-align:center; }
+        header { margin-bottom:12px; }
+        h1 { color:#d35400; font-size:2.4rem; text-shadow:2px 2px 4px rgba(0,0,0,0.15); margin-bottom:6px; }
+        h1::after { content:''; display:block; width:100px; height:4px; margin:8px auto 0; background:linear-gradient(to right,#e74c3c,#f39c12); border-radius:2px; }
+        .date-display { color:#7f8c8d; font-size:0.95rem; margin-bottom:4px; background:rgba(255,255,255,0.8); padding:5px 12px; border-radius:20px; display:inline-block; box-shadow:0 3px 10px rgba(0,0,0,0.08); }
+        .buy-domain { font-size:0.8rem; color:#7f8c8d; margin-top:2px; }
+        .buy-domain a { color:#d35400; }
+        .sound-toggle { position:fixed; top:14px; right:14px; z-index:70; width:42px; height:42px; border-radius:50%; border:none; background:rgba(255,255,255,0.85); color:#d35400; font-size:1.1rem; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.15); }
 
-        @media (max-width: 768px) {
-    .mobile-only {
-        display: flex !important;
-        justify-content: center;
-        gap: 15px;
-        margin-top: 0;
-    }
-    .mobile-only .share-btn {
-        padding: 15px;
-        min-width: 48px;
-        min-height: 48px;
-        font-size: 1.7rem;
-        justify-content: center;
-        border-radius: 50%;
-        aspect-ratio: 1/1;
-    }
-    .mobile-only .share-btn i {
-        margin: 0;
-    }
-}
-        
-        /* 分享提示文本 */
-        .share-hint {
-            text-align: center;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-        
-        /* 二维码弹窗 */
-        .qr-modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.85); 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 1000; 
-            flex-direction: column;
-        }
-        
-        .qr-modal-content { 
-            background: white; 
-            padding: 25px; 
-            border-radius: 20px; 
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            max-width: 90%;
-        }
-        
-        .qr-modal-content img { 
-            width: 250px; 
-            height: 250px; 
-            border-radius: 10px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            margin-bottom: 15px;
-        }
-        
-        .qr-modal-close {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 15px;
-            font-size: 1rem;
-        }
-        
-        .qr-modal-title {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.4rem;
-        }
-        
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            .share-btn {
-                padding: 15px 20px;
-                font-size: 1.1rem;
-            }
-            
-            .desktop-only {
-                display: none !important;
-            }
-        }
-        
-        @media (min-width: 769px) {
-            .mobile-only {
-                display: none !important;
-            }
-        }
-        
-        /* 提示工具 */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 140px;
-            background-color: #555;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -70px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.9rem;
-        }
-        
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #555 transparent transparent transparent;
-        }
-        
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        
-        /* 复制成功提示 */
-        .copy-success {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(46, 204, 113, 0.9);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            z-index: 1001;
-            animation: fadeInOut 2s forwards;
-            display: none;
-        }
-        
-        @keyframes fadeInOut {
-            0% { opacity: 0; top: 10px; }
-            20% { opacity: 1; top: 20px; }
-            80% { opacity: 1; top: 20px; }
-            100% { opacity: 0; top: 10px; display: none; }
-        }
+        /* 主菜单 */
+        .mode-menu { display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:12px; margin:14px 0 16px; }
+        .mode-card { background:linear-gradient(135deg,#2c3e50,#4a69bd); color:#fff; border:none; border-radius:16px; padding:16px 8px; cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,0.22); transition:transform .2s; }
+        .mode-card:hover { transform:translateY(-4px); }
+        .mode-card .ic { font-size:1.8rem; display:block; margin-bottom:6px; }
+        .mode-card .lb { font-size:0.95rem; display:block; }
+        .mode-card .sub { font-size:0.7rem; opacity:.7; margin-top:3px; display:block; }
+
+        /* 玩法区：选完后置顶为视觉主体 */
+        .play-area { margin-bottom:16px; }
+        .panel { background:linear-gradient(135deg,#2c3e50,#4a69bd); border-radius:20px; padding:22px; box-shadow:0 15px 35px rgba(0,0,0,0.25); border:5px solid #f39c12; }
+        .panel.hidden { display:none !important; }
+        .back-btn { display:inline-block; margin-bottom:12px; background:rgba(255,255,255,0.85); color:#2c3e50; border:none; padding:6px 16px; border-radius:20px; cursor:pointer; font-size:0.85rem; }
+        .spin-button { background:linear-gradient(to right,#e74c3c,#f39c12); color:#fff; border:none; padding:14px 40px; font-size:1.3rem; border-radius:50px; cursor:pointer; transition:all .3s; box-shadow:0 8px 20px rgba(231,76,60,0.45); }
+        .spin-button:hover { transform:translateY(-3px); }
+        .spin-button:disabled { background:#bdc3c7; cursor:not-allowed; transform:none; box-shadow:none; }
+
+        /* 偏好设置（折叠） */
+        .settings { background:#fff; border-radius:18px; padding:12px 16px; box-shadow:0 10px 30px rgba(0,0,0,0.12); margin-bottom:16px; text-align:left; }
+        .settings summary { cursor:pointer; color:#e74c3c; font-size:1.1rem; font-weight:bold; list-style:none; }
+        .settings summary::-webkit-details-marker { display:none; }
+        .settings summary::before { content:'▸ '; }
+        .settings[open] summary::before { content:'▾ '; }
+        .settings-inner { margin-top:12px; }
+
+        .filters { display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-bottom:10px; }
+        .chip { border:2px solid #f39c12; background:#fff; color:#d35400; padding:5px 14px; border-radius:20px; cursor:pointer; font-size:0.85rem; transition:all .2s; }
+        .chip.active { background:linear-gradient(to right,#e74c3c,#f39c12); color:#fff; border-color:transparent; }
+        .exclude-row { font-size:0.85rem; color:#7f8c8d; margin-bottom:8px; text-align:center; }
+        .exclude-row b { color:#e74c3c; }
+
+        .food-list { background:#f7f9fb; border-radius:16px; padding:14px; margin-bottom:12px; }
+        .food-list-title { color:#e74c3c; font-size:1.15rem; margin-bottom:10px; text-align:center; }
+        .food-items { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+        .food-tag { background:linear-gradient(to right,#74b9ff,#0984e3); color:#fff; padding:6px 13px; border-radius:20px; font-size:0.85rem; cursor:pointer; user-select:none; box-shadow:0 3px 10px rgba(0,0,0,0.08); transition:opacity .2s; }
+        .food-tag.excluded { opacity:.35; text-decoration:line-through; background:#b2bec3; }
+        .history-row { font-size:0.82rem; color:#7f8c8d; text-align:center; margin-top:8px; }
+        .history-row span { color:#d35400; font-weight:bold; }
+        .avoid-toggle { font-size:0.8rem; color:#7f8c8d; text-align:center; display:block; margin-top:6px; }
+        .avoid-toggle input { vertical-align:middle; }
+
+        .custom-panel h3 { color:#e74c3c; font-size:1.1rem; margin-bottom:10px; text-align:center; }
+        .custom-input-row { display:flex; gap:8px; margin-bottom:10px; }
+        .custom-input-row input { flex:1; padding:9px 13px; border:2px solid #dfe6e9; border-radius:12px; font-size:0.95rem; outline:none; }
+        .custom-input-row input:focus { border-color:#f39c12; }
+        .custom-input-row button { background:linear-gradient(to right,#e74c3c,#f39c12); color:#fff; border:none; padding:0 20px; border-radius:12px; cursor:pointer; font-size:0.95rem; }
+        .custom-list { display:flex; flex-wrap:wrap; gap:7px; }
+        .custom-item { display:flex; align-items:center; gap:5px; background:#f5f6fa; padding:5px 11px; border-radius:18px; font-size:0.82rem; }
+        .custom-item button { border:none; background:#e74c3c; color:#fff; width:18px; height:18px; border-radius:50%; cursor:pointer; font-size:0.75rem; line-height:1; }
+        .custom-empty { color:#95a5a6; font-size:0.85rem; }
+
+        /* 老虎机 */
+        .reels-container { display:flex; justify-content:center; gap:14px; margin-bottom:24px; perspective:1000px; }
+        .reel { width:110px; height:280px; background:#fff; border-radius:10px; overflow:hidden; position:relative; box-shadow:inset 0 0 15px rgba(0,0,0,0.25),0 5px 15px rgba(0,0,0,0.3); }
+        .reel-inner { position:absolute; width:100%; top:0; transition:top 4s cubic-bezier(0.17,0.67,0.83,0.67); }
+        .reel-item { height:93.33px; display:flex; align-items:center; justify-content:center; font-size:2.4rem; }
+        .reel-glass { position:absolute; inset:0; background:linear-gradient(125deg,rgba(255,255,255,0.3),rgba(255,255,255,0.05) 50%,rgba(255,255,255,0.3)); pointer-events:none; border-radius:10px; }
+        .slot-middle { position:absolute; top:50%; left:15px; right:15px; height:93.33px; border-top:3px dashed #e74c3c; border-bottom:3px dashed #e74c3c; transform:translateY(-50%); pointer-events:none; z-index:10; box-sizing:border-box; }
+        .slot-wrap { position:relative; display:flex; justify-content:center; }
+
+        /* 大转盘 */
+        .wheel-stage { position:relative; width:300px; height:300px; margin:0 auto 18px; }
+        .wheel { width:300px; height:300px; border-radius:50%; position:relative; transition:transform 4.5s cubic-bezier(0.17,0.67,0.12,0.99); box-shadow:0 8px 22px rgba(0,0,0,0.3); border:6px solid #fff; }
+        .wheel-label { position:absolute; left:50%; top:50%; font-size:1.4rem; transform-origin:0 0; }
+        .wheel-pointer { position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:14px solid transparent; border-right:14px solid transparent; border-top:26px solid #e74c3c; z-index:5; filter:drop-shadow(0 2px 2px rgba(0,0,0,0.3)); }
+
+        /* 骰子 */
+        .dice-stage { display:flex; justify-content:center; gap:22px; margin:8px 0 18px; }
+        .die { width:84px; height:84px; background:#fff; border-radius:16px; box-shadow:0 6px 14px rgba(0,0,0,0.25); display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); padding:12px; gap:4px; }
+        .die .pip { width:14px; height:14px; background:#2c3e50; border-radius:50%; align-self:center; justify-self:center; }
+        .pip.on { visibility:visible; } .pip.off { visibility:hidden; }
+
+        /* 刮刮乐 */
+        .scratch-box { position:relative; width:260px; height:160px; margin:0 auto 16px; border-radius:14px; overflow:hidden; box-shadow:0 6px 16px rgba(0,0,0,0.25); touch-action:none; }
+        .scratch-prize { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg,#fff4e6,#ffeaa7); }
+        .scratch-prize .em { font-size:3rem; }
+        .scratch-prize .nm { font-size:1.4rem; color:#d35400; font-weight:bold; }
+        .scratch-canvas { position:absolute; inset:0; cursor:grab; }
+        .scratch-hint { color:#fff; font-size:0.85rem; margin-bottom:12px; }
+
+        /* 抽签筒 */
+        .stick-tube { width:120px; height:150px; margin:0 auto 14px; background:linear-gradient(to right,#c9a24b,#e6c879,#c9a24b); border-radius:14px 14px 6px 6px; position:relative; box-shadow:inset 0 -18px 26px rgba(0,0,0,0.22); }
+        .stick-tube::before { content:''; position:absolute; top:-9px; left:-7px; right:-7px; height:16px; background:#b8902f; border-radius:8px; }
+        .stick-tube.shake { animation:shake .5s ease; }
+        @keyframes shake { 0%,100%{transform:rotate(0);} 25%{transform:rotate(-9deg);} 75%{transform:rotate(9deg);} }
+        .stick-result { background:#fff; border-radius:14px; padding:14px; box-shadow:0 6px 16px rgba(0,0,0,0.2); max-width:280px; margin:0 auto; }
+        .stick-result .em { font-size:2.6rem; }
+        .stick-result .nm { font-size:1.5rem; color:#d35400; font-weight:bold; margin:4px 0; }
+        .stick-result .fortune { color:#7f8c8d; font-size:0.95rem; }
+
+        /* 翻牌 */
+        .flip-grid { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-bottom:16px; }
+        .flip-card { width:84px; height:112px; perspective:600px; cursor:pointer; }
+        .flip-inner { position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d; }
+        .flip-card.flipped .flip-inner { transform:rotateY(180deg); }
+        .flip-face { position:absolute; inset:0; backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.2); }
+        .flip-back { background:linear-gradient(135deg,#4a69bd,#2c3e50); color:#fff; font-size:1.8rem; }
+        .flip-front { background:#fff; transform:rotateY(180deg); }
+        .flip-front .em { font-size:2rem; }
+        .flip-front .nm { font-size:0.85rem; color:#d35400; }
+
+        /* 抽卡 */
+        .gacha-fan { display:flex; justify-content:center; gap:8px; margin-bottom:14px; }
+        .gacha-card { width:78px; height:118px; border-radius:10px; background:linear-gradient(135deg,#636e72,#2d3436); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.9rem; box-shadow:0 4px 10px rgba(0,0,0,0.25); transition:transform .4s; }
+        .gacha-card.reveal { transform:translateY(-10px) scale(1.06); }
+        .gacha-result { background:#fff; border-radius:14px; padding:14px; box-shadow:0 6px 16px rgba(0,0,0,0.2); max-width:280px; margin:0 auto; }
+        .gacha-result .em { font-size:2.6rem; }
+        .gacha-result .nm { font-size:1.5rem; color:#d35400; font-weight:bold; }
+        .gacha-result .rar { font-size:1rem; font-weight:bold; margin-top:4px; }
+        .rarity-R .rar { color:#7f8c8d; }
+        .rarity-SR .rar { color:#2980b9; }
+        .rarity-SSR { box-shadow:0 0 22px #f1c40f !important; animation:gold 1s infinite alternate; }
+        .rarity-SSR .rar { color:#e67e22; }
+        @keyframes gold { from{box-shadow:0 0 14px #f1c40f;} to{box-shadow:0 0 30px #f39c12;} }
+
+        /* 底部商业化常驻条 */
+        .promo-bar { position:fixed; bottom:0; left:0; right:0; background:linear-gradient(to right,#e74c3c,#f39c12); display:flex; align-items:center; justify-content:center; gap:12px; padding:8px 14px; box-shadow:0 -4px 14px rgba(0,0,0,0.25); z-index:60; color:#fff; cursor:pointer; }
+        .promo-bar img { width:42px; height:42px; border-radius:8px; background:#fff; padding:2px; }
+        .promo-bar .pb-text { font-weight:bold; font-size:0.95rem; }
+        .promo-bar .pb-sub { font-size:0.72rem; opacity:.92; }
+
+        /* 弹窗通用 */
+        .result-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); justify-content:center; align-items:center; z-index:1000; padding:16px; }
+        .result-modal.show { display:flex; }
+        #promoModal { z-index:1001; } /* 必须在 resultModal 之上，否则从结果弹窗里打开会被遮住 */
+        .result-card { background:#fff; border-radius:22px; padding:24px 20px; text-align:center; max-width:380px; width:100%; box-shadow:0 16px 40px rgba(0,0,0,0.4); position:relative; animation:pop .35s ease-out; }
+        @keyframes pop { from{transform:scale(.85);opacity:0;} to{transform:scale(1);opacity:1;} }
+        .rm-close { position:absolute; top:12px; right:16px; border:none; background:none; font-size:1.6rem; color:#95a5a6; cursor:pointer; }
+        .rm-emoji { font-size:4rem; margin:6px 0; }
+        .rm-name { font-size:2rem; color:#d35400; font-weight:bold; margin-bottom:6px; }
+        .rm-tip { color:#7f8c8d; font-size:1rem; margin-bottom:14px; }
+        .rm-actions { display:flex; gap:10px; justify-content:center; margin-bottom:14px; }
+        .rm-actions button { border:none; padding:10px 18px; border-radius:50px; cursor:pointer; font-size:0.95rem; }
+        #rmAgain { background:#ecf0f1; color:#2c3e50; }
+        #rmOk { background:linear-gradient(to right,#e74c3c,#f39c12); color:#fff; }
+        .rm-qr { display:flex; justify-content:center; gap:14px; margin-bottom:12px; }
+        .rm-qr > div { display:flex; flex-direction:column; align-items:center; }
+        .rm-qr img { width:100px; height:100px; border-radius:10px; background:#f5f5f5; padding:4px; box-shadow:0 3px 10px rgba(0,0,0,0.12); }
+        .rm-qr span { font-size:0.75rem; color:#7f8c8d; margin-top:4px; }
+        .rm-share { display:flex; flex-direction:column; align-items:center; gap:8px; }
+        .rm-share button { color:#fff; border:none; padding:10px 22px; border-radius:50px; cursor:pointer; font-size:0.95rem; width:100%; }
+        #rmShare { background:linear-gradient(to right,#1aad19,#0f9d0f); }
+        #rmCardBtn { background:linear-gradient(to right,#3498db,#2980b9); }
+        .rm-pageqr-wrap { display:flex; flex-direction:column; align-items:center; }
+        .rm-pageqr-wrap img { width:90px; height:90px; border-radius:8px; }
+        .rm-pageqr-wrap span { font-size:0.72rem; color:#95a5a6; margin-top:3px; }
+        /* 海报弹窗（层级最高，需盖在结果弹窗之上） */
+        #posterModal { z-index:1002; }
+        .poster-hint { color:#95a5a6; font-size:0.8rem; margin-bottom:8px; }
+        .poster-img { max-width:100%; max-height:58vh; border-radius:12px; margin:6px 0 10px; box-shadow:0 6px 16px rgba(0,0,0,0.25); background:#f5f5f5; }
+        .poster-dl { display:inline-block; background:linear-gradient(to right,#3498db,#2980b9); color:#fff; padding:10px 28px; border-radius:50px; text-decoration:none; font-size:0.95rem; box-shadow:0 6px 16px rgba(52,152,219,0.4); }
+
+        footer { margin-top:6px; color:#7f8c8d; font-size:0.8rem; padding:12px; text-align:center; }
+        .copy-toast { position:fixed; top:18px; left:50%; transform:translateX(-50%); background:rgba(46,204,113,0.92); color:#fff; padding:11px 20px; border-radius:50px; box-shadow:0 5px 15px rgba(0,0,0,0.2); z-index:1001; display:none; }
     </style>
 </head>
 <body>
+    <button class="sound-toggle" id="soundToggle" title="音效开关"><i class="fas fa-volume-up"></i></button>
     <div class="container">
         <header>
             <h1><i class="fas fa-utensils"></i> 今天吃啥？</h1>
-            <h5><i class="fas fa-shopping-cart"></i> 买域名联系<br><a href="mailto:940360084@qq.com" target="_blank">940360084@qq.com</a></h5>
             <div class="date-display" id="dateDisplay"></div>
-            <div class="holiday-mode" id="holidayMode" style="display:none;">
-                <i class="fas fa-gift"></i> 节日模式已开启，大餐概率提升！
-            </div>
+            <div class="buy-domain">买域名联系 <a href="mailto:940360084@qq.com">940360084@qq.com</a></div>
         </header>
-        <div class="slot-machine">
-            <div class="reels-container" id="reelsContainer"></div>
-            <div class="slot-middle"></div>
-            <div class="controls"><button class="spin-button" id="spinButton"><i class="fas fa-redo-alt"></i> 拉杆开始！</button></div>
+
+        <!-- 主菜单：决策游戏合集 -->
+        <div class="mode-menu" id="modeMenu">
+            <button class="mode-card" data-mode="machine"><span class="ic">🎰</span><span class="lb">老虎机</span><span class="sub">经典三连</span></button>
+            <button class="mode-card" data-mode="wheel"><span class="ic">🎡</span><span class="lb">大转盘</span><span class="sub">转出生肖</span></button>
+            <button class="mode-card" data-mode="dice"><span class="ic">🎲</span><span class="lb">骰子</span><span class="sub">点数定菜</span></button>
+            <button class="mode-card" data-mode="scratch"><span class="ic">🎫</span><span class="lb">刮刮乐</span><span class="sub">刮开惊喜</span></button>
+            <button class="mode-card" data-mode="sticks"><span class="ic">🎋</span><span class="lb">抽签筒</span><span class="sub">中式玄学</span></button>
+            <button class="mode-card" data-mode="flip"><span class="ic">🃏</span><span class="lb">翻牌</span><span class="sub">翻一张定</span></button>
+            <button class="mode-card" data-mode="gacha"><span class="ic">✨</span><span class="lb">抽卡SSR</span><span class="sub">金光特效</span></button>
+            <button class="mode-card" data-mode="quick" style="background:linear-gradient(135deg,#e74c3c,#f39c12);"><span class="ic">⚡</span><span class="lb">直接帮我选</span><span class="sub">不想玩了</span></button>
         </div>
-        <div class="result-container" id="resultContainer">
-            <div class="result-title">推荐美食</div>
-            <div class="result-content" id="resultContent"></div>
-            <div class="qr-code">
-                <img src="https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg" alt="领券二维码">
-                <div class="qr-code-text">扫码领券，享更多优惠</div>
+
+        <!-- 玩法区：选中后置顶为视觉主体 -->
+        <div class="play-area" id="playArea">
+            <div class="panel hidden" id="machineSection"><button class="back-btn" data-back>← 换玩法</button>
+                <div class="slot-wrap"><div class="reels-container" id="reelsContainer"></div><div class="slot-middle"></div></div>
+                <button class="spin-button" id="spinMachine"><i class="fas fa-redo-alt"></i> 拉杆开始！</button>
+            </div>
+            <div class="panel hidden" id="wheelSection"><button class="back-btn" data-back>← 换玩法</button>
+                <div class="wheel-stage"><div class="wheel-pointer"></div><div class="wheel" id="wheel"></div></div>
+                <button class="spin-button" id="spinWheelBtn"><i class="fas fa-sync"></i> 转一转！</button>
+            </div>
+            <div class="panel hidden" id="diceSection"><button class="back-btn" data-back>← 换玩法</button>
+                <div class="dice-stage"><div class="die" id="die1"></div><div class="die" id="die2"></div></div>
+                <button class="spin-button" id="rollDiceBtn"><i class="fas fa-dice"></i> 掷骰子！</button>
+            </div>
+            <div class="panel hidden" id="scratchSection"><button class="back-btn" data-back>← 换玩法</button>
+                <div class="scratch-hint">用手指/鼠标刮开灰色涂层，刮到一半自动揭晓～</div>
+                <div class="scratch-box" id="scratchBox">
+                    <div class="scratch-prize" id="scratchPrize"><div class="em">🍜</div><div class="nm">拉面</div></div>
+                    <canvas class="scratch-canvas" id="scratchCanvas" width="260" height="160"></canvas>
+                </div>
+                <button class="spin-button" id="scratchAgain"><i class="fas fa-redo"></i> 换一张刮</button>
+            </div>
+            <div class="panel hidden" id="sticksSection"><button class="back-btn" data-back>← 换玩法</button>
+                <div class="stick-tube" id="stickTube"></div>
+                <button class="spin-button" id="drawStickBtn"><i class="fas fa-hand-point-up"></i> 摇一摇求签</button>
+                <div id="stickResultWrap" style="margin-top:14px;"></div>
+            </div>
+            <div class="panel hidden" id="flipSection"><button class="back-btn" data-back>← 换玩法</button>
+                <div class="flip-grid" id="flipGrid"></div>
+                <button class="spin-button" id="flipAgain"><i class="fas fa-redo"></i> 重新洗牌</button>
+            </div>
+            <div class="panel hidden" id="gachaSection"><button class="back-btn" data-back>← 换玩法</button>
+                <div class="gacha-fan" id="gachaFan"></div>
+                <button class="spin-button" id="drawGachaBtn"><i class="fas fa-star"></i> 单抽！</button>
+                <div id="gachaResultWrap" style="margin-top:14px;"></div>
             </div>
         </div>
-        <div class="food-list">
-            <div class="food-list-title">美食清单</div>
-            <div class="food-items" id="foodItems"></div>
-        </div>
-        
-        <!-- 分享按钮容器 -->
-        <div class="share-buttons-container">
-    <div class="share-hint" id="shareHint">分享美食，传递快乐~</div>
-    <div class="share-buttons" id="shareButtons">
-        <!-- 移动端分享按钮（仅图标，一排显示） -->
-        <div class="mobile-only">
-            <button class="share-btn wechat" title="微信"><i class="fab fa-weixin"></i></button>
-            <button class="share-btn qq" title="QQ"><i class="fab fa-qq"></i></button>
-            <button class="share-btn weibo" title="微博"><i class="fab fa-weibo"></i></button>
-            <button class="share-btn douyin" title="抖音"><i class="fas fa-music"></i></button>
-        </div>
-        <!-- 电脑端分享按钮 -->
-        <div class="desktop-only">
-            <button class="share-btn qr-code tooltip" id="showQrBtn">
-                <i class="fas fa-qrcode"></i> 二维码
-                <span class="tooltiptext">显示页面二维码</span>
-            </button>
-            <button class="share-btn copy-link tooltip" id="copyLinkBtn">
-                <i class="fas fa-link"></i> 复制链接
-                <span class="tooltiptext">复制页面链接</span>
-            </button>
-        </div>
-    </div>
-</div>
-    </div>
-    <footer>© 2023-现在 美食老虎机 - 解决您的选择困难症</footer>
-    <div class="debug-info" id="debugInfo"></div>
 
-    <!-- 悬浮二维码角标 -->
-    <div class="floating-qr">
-        <img src="https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg" alt="领券二维码">
-        <div class="floating-qr-text">领券</div>
+        <!-- 偏好设置（折叠，玩法之下） -->
+        <details class="settings" open>
+            <summary>⚙ 偏好设置（筛选类型 · 划掉不吃的 · 自定义菜品）</summary>
+            <div class="settings-inner">
+                <div class="filters" id="filters"></div>
+                <div class="exclude-row" id="excludeRow"></div>
+                <div class="food-list">
+                    <div class="food-list-title"><i class="fas fa-list"></i> 候选清单 <small style="font-size:.75rem;color:#95a5a6;">（点一下划掉不想吃的）</small></div>
+                    <div class="food-items" id="foodItems"></div>
+                    <div class="history-row" id="historyRow">最近：<span>暂无</span></div>
+                    <label class="avoid-toggle"><input type="checkbox" id="avoidRecent" checked> 避免连续重复（最近 3 次不推）</label>
+                </div>
+                <div class="custom-panel">
+                    <h3><i class="fas fa-plus-circle"></i> 自定义我的菜品</h3>
+                    <div class="custom-input-row">
+                        <input id="customName" type="text" placeholder="输入菜名，如：楼下黄焖鸡" maxlength="12">
+                        <button id="addDishBtn">添加</button>
+                    </div>
+                    <div class="custom-list" id="customList"></div>
+                </div>
+            </div>
+        </details>
     </div>
 
-    <!-- 二维码弹窗 -->
-    <div class="qr-modal" id="qrModal">
-        <div class="qr-modal-content">
-            <div class="qr-modal-title">扫描二维码分享页面</div>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=soqh.cn" alt="页面二维码"> &nbsp <img src="https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg" alt="领券二维码"><br/>
-            <button class="qr-modal-close" id="closeQrModal">关闭</button>
+    <footer>© 2023-现在 今天吃啥 · 决策游戏合集（免费工具）</footer>
+    <div class="copy-toast" id="copyToast"><i class="fas fa-check-circle"></i> 已复制，去分享吧~</div>
+
+    <!-- 底部商业化常驻条 -->
+    <div class="promo-bar" id="promoBar">
+        <img id="pbCoupon" alt="领券">
+        <div><div class="pb-text">扫码领券 · 今天吃饭更划算</div><div class="pb-sub">点我放大二维码 →</div></div>
+    </div>
+
+    <!-- 商业化弹窗（领券） -->
+    <div class="result-modal" id="promoModal">
+        <div class="result-card">
+            <button class="rm-close" id="promoClose">×</button>
+            <div class="rm-name" style="font-size:1.4rem;">扫码领券更划算</div>
+            <div class="rm-qr">
+                <div><img id="promoCoupon" alt="领券二维码"><span>领券更划算</span></div>
+            </div>
+            <div class="rm-tip">下单即享优惠，站长拿小额返利，工具持续免费～</div>
         </div>
     </div>
 
-    <!-- 复制成功提示 -->
-    <div class="copy-success" id="copySuccess">
-        <i class="fas fa-check-circle"></i> 链接已复制到剪贴板！
+    <!-- 结果弹窗 -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-card">
+            <button class="rm-close" id="rmClose">×</button>
+            <div class="rm-emoji" id="rmEmoji">🍲</div>
+            <div class="rm-name" id="rmName">火锅</div>
+            <div class="rm-tip" id="rmTip">今天值得犒劳自己一顿！</div>
+            <div class="rm-actions">
+                <button id="rmAgain">换一个</button>
+                <button id="rmOk">就吃这个</button>
+            </div>
+            <div class="rm-qr" id="rmQr">
+                <div><img id="rmCouponQr" alt="领券二维码" style="cursor:pointer;"><span>扫码领券更划算</span></div>
+            </div>
+            <div class="rm-share">
+                <button id="rmShare"><i class="fas fa-share-alt"></i> 分享给朋友</button>
+                <div class="rm-pageqr-wrap"><img id="rmPageQr" alt="页面二维码"><span>长按/扫码打开本页</span></div>
+                <button id="rmCardBtn"><i class="fas fa-image"></i> 生成菜单海报</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 菜单海报弹窗（独立弹窗） -->
+    <div class="result-modal" id="posterModal">
+        <div class="result-card">
+            <button class="rm-close" id="posterClose">×</button>
+            <div class="rm-name" style="font-size:1.4rem;">今日菜单海报</div>
+            <div class="poster-hint">长按图片可保存，或点下方按钮保存</div>
+            <img class="poster-img" id="posterImg" alt="今日菜单海报">
+            <a class="poster-dl" id="posterDl" download="今日菜单.png"><i class="fas fa-download"></i> 保存海报</a>
+        </div>
     </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function(){
-        const foodItems=[
-            { name:"火锅", type:"大餐", color:"#e74c3c", emoji:"🍲" },
-            { name:"披萨", type:"西餐", color:"#3498db", emoji:"🍕" },
-            { name:"寿司", type:"日料", color:"#2ecc71", emoji:"🍣" },
-            { name:"烧烤", type:"大餐", color:"#f39c12", emoji:"🍢" },
-            { name:"炸鸡", type:"快餐", color:"#9b59b6", emoji:"🍗" },
-            { name:"拉面", type:"面食", color:"#1abc9c", emoji:"🍜" },
-            { name:"炒饭", type:"主食", color:"#d35400", emoji:"🍚" },
-            { name:"沙拉", type:"轻食", color:"#27ae60", emoji:"🥗" },
-            { name:"汉堡", type:"快餐", color:"#8e44ad", emoji:"🍔" },
-            { name:"牛排", type:"西餐", color:"#c0392b", emoji:"🥩" },
-            { name:"饺子", type:"中餐", color:"#16a085", emoji:"🥟" },
-            { name:"咖喱", type:"亚洲", color:"#e67e22", emoji:"🍛" },
-            { name:"砂锅", type:"中餐", color:"#8e44ad", emoji:"🥘" },
-            { name:"盖饭", type:"主食", color:"#f1c40f", emoji:"🍛" },
-            { name:"凉皮", type:"小吃", color:"#27ae60", emoji:"🍝" },
-            { name:"酸辣粉", type:"小吃", color:"#e67e22", emoji:"🍜" },
-            { name:"螺蛳粉", type:"小吃", color:"#16a085", emoji:"🍲" },
-            { name:"热干面", type:"面食", color:"#f39c12", emoji:"🍜" },
-            { name:"烩面", type:"面食", color:"#d35400", emoji:"🍜" },
-            { name:"麻辣烫", type:"小吃", color:"#c0392b", emoji:"🍲" },
-            { name:"自助餐", type:"大餐", color:"#9b59b6", emoji:"🍽️" },
-            { name:"烤肉", type:"大餐", color:"#e74c3c", emoji:"🍖" }
-        ];
-        const reelsContainer=document.getElementById('reelsContainer');
-        const spinButton=document.getElementById('spinButton');
-        const resultContainer=document.getElementById('resultContainer');
-        const resultContent=document.getElementById('resultContent');
-        const foodItemsContainer=document.getElementById('foodItems');
-        const debugInfo=document.getElementById('debugInfo');
-        const copySuccess = document.getElementById('copySuccess');
-        let isSpinning=false; let reels=[];
+document.addEventListener('DOMContentLoaded', function(){
+    /* ---------- 数据 ---------- */
+    const DEFAULT_DISHES = [
+        { name:"火锅", type:"大餐", color:"#e74c3c", emoji:"🍲" },
+        { name:"披萨", type:"西餐", color:"#3498db", emoji:"🍕" },
+        { name:"寿司", type:"日料", color:"#2ecc71", emoji:"🍣" },
+        { name:"烧烤", type:"大餐", color:"#f39c12", emoji:"🍢" },
+        { name:"炸鸡", type:"快餐", color:"#9b59b6", emoji:"🍗" },
+        { name:"拉面", type:"面食", color:"#1abc9c", emoji:"🍜" },
+        { name:"炒饭", type:"主食", color:"#d35400", emoji:"🍚" },
+        { name:"沙拉", type:"轻食", color:"#27ae60", emoji:"🥗" },
+        { name:"汉堡", type:"快餐", color:"#8e44ad", emoji:"🍔" },
+        { name:"牛排", type:"西餐", color:"#c0392b", emoji:"🥩" },
+        { name:"饺子", type:"中餐", color:"#16a085", emoji:"🥟" },
+        { name:"咖喱", type:"亚洲", color:"#e67e22", emoji:"🍛" },
+        { name:"砂锅", type:"中餐", color:"#8e44ad", emoji:"🥘" },
+        { name:"盖饭", type:"主食", color:"#f1c40f", emoji:"🍛" },
+        { name:"凉皮", type:"小吃", color:"#27ae60", emoji:"🍝" },
+        { name:"酸辣粉", type:"小吃", color:"#e67e22", emoji:"🍜" },
+        { name:"螺蛳粉", type:"小吃", color:"#16a085", emoji:"🍲" },
+        { name:"热干面", type:"面食", color:"#f39c12", emoji:"🍜" },
+        { name:"烩面", type:"面食", color:"#d35400", emoji:"🍜" },
+        { name:"麻辣烫", type:"小吃", color:"#c0392b", emoji:"🍲" },
+        { name:"自助餐", type:"大餐", color:"#9b59b6", emoji:"🍽️" },
+        { name:"烤肉", type:"大餐", color:"#e74c3c", emoji:"🍖" }
+    ];
+    const MINIAPP_QR = 'static/qr/miniapp.png'; // 吃喝玩乐小程序码（同源资源，可安全画入可保存海报）
+    const COUPON_QR  = 'https://img.jutuike.com/assets/kfqrcode/24853/20250822/ea36ce9e20b300384b705e0562d7d06c.jpg';
+    const QR_API     = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=';
+    const CUSTOM_KEY = 'my_dishes_v1';
+    const HISTORY_KEY= 'eat_history_v1';
+    const EXCLUDE_KEY= 'eat_excluded_v1';
+    const MUTE_KEY   = 'eat_muted_v1';
+    const TIPS = ['今天值得犒劳自己一顿！','就它了，别纠结～','选择困难症的克星上线','好吃不过如此，开动吧！','随机也是一种浪漫','听机器的，准没错'];
+    const FORTUNES = ['今日宜吃辣，忌清淡','宜聚餐，忌独食','宜犒劳，忌将就','宜尝鲜，忌老三样','宜清淡，忌油腻','宜任性，忌犹豫','宜嗦粉，忌将就','宜大餐，忌将就'];
 
-        // 悬浮二维码放大
-        const floatingQr = document.querySelector('.floating-qr');
-        const qrModal = document.getElementById('qrModal');
+    let customDishes = loadCustom();
+    let activeTypes = new Set();
+    let excluded = loadExcluded();
+    let history = loadHistory();
+    let avoidRecent = true;
+    let muted = localStorage.getItem(MUTE_KEY)==='1';
+    let mode = 'menu';
+    let lastFood = null;
 
-        floatingQr.addEventListener('click', ()=>{ qrModal.style.display='flex'; });
-        qrModal.addEventListener('click', ()=>{ qrModal.style.display='none'; });
-
-        // 设备检测函数
-        function isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    /* ---------- 工具 ---------- */
+    function loadCustom(){ try { return JSON.parse(localStorage.getItem(CUSTOM_KEY)) || []; } catch(e){ return []; } }
+    function saveCustom(l){ localStorage.setItem(CUSTOM_KEY, JSON.stringify(l)); }
+    function loadExcluded(){ try { return new Set(JSON.parse(localStorage.getItem(EXCLUDE_KEY)) || []); } catch(e){ return new Set(); } }
+    function saveExcluded(){ localStorage.setItem(EXCLUDE_KEY, JSON.stringify([...excluded])); }
+    function loadHistory(){ try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch(e){ return []; } }
+    function saveHistory(){ localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
+    function allDishes(){ return DEFAULT_DISHES.concat(customDishes); }
+    function currentDishes(){ const a=allDishes(); return activeTypes.size ? a.filter(d=>activeTypes.has(d.type)) : a; }
+    function effectivePool(){
+        let p = currentDishes().filter(d=>!excluded.has(d.name));
+        if(avoidRecent && history.length){
+            const recent = new Set(history.slice(0,3));
+            const f = p.filter(d=>!recent.has(d.name));
+            if(f.length) p = f;
         }
-        
-        // 更新分享提示文本
-        function updateShareHint() {
-            const shareHint = document.getElementById('shareHint');
-            if (isMobileDevice()) {
-                shareHint.textContent = '分享到社交平台';
-            } else {
-                shareHint.textContent = '分享本页面给朋友';
-            }
-        }
-        
-        // 初始化分享功能
-        function initShareFunctions() {
-            const showQrBtn = document.getElementById('showQrBtn');
-            const closeQrModal = document.getElementById('closeQrModal');
-            const qrModal = document.getElementById('qrModal');
-            const copyLinkBtn = document.getElementById('copyLinkBtn');
-            const copySuccess = document.getElementById('copySuccess');
-            
-            // 显示二维码弹窗
-            if (showQrBtn) {
-                showQrBtn.addEventListener('click', function() {
-                    qrModal.style.display = 'flex';
-                });
-            }
-            
-            // 关闭二维码弹窗
-            if (closeQrModal) {
-                closeQrModal.addEventListener('click', function() {
-                    qrModal.style.display = 'none';
-                });
-            }
-            
-            // 点击弹窗背景关闭
-            qrModal.addEventListener('click', function(e) {
-                if (e.target === qrModal) {
-                    qrModal.style.display = 'none';
-                }
-            });
-            
-            // 复制链接功能
-            if (copyLinkBtn) {
-                copyLinkBtn.addEventListener('click', function() {
-                    const url = window.location.href;
-                    navigator.clipboard.writeText(url).then(function() {
-                        // 显示成功提示
-                        copySuccess.style.display = 'block';
-                        setTimeout(function() {
-                            copySuccess.style.display = 'none';
-                        }, 2000);
-                    }).catch(function(err) {
-                        console.error('无法复制链接: ', err);
-                        alert('复制失败，请手动复制链接: ' + url);
-                    });
-                });
-            }
-            
-            // 移动端分享按钮事件
-            document.querySelectorAll('.mobile-only .share-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const platform = this.textContent.trim();
-                    const url = window.location.href;
-                    navigator.clipboard.writeText(url).then(function() {
-                        // 显示自定义成功提示
-                        copySuccess.innerHTML = `<i class="fas fa-check-circle"></i> 页面链接已复制，快分享到${platform}，一起看看今天吃啥~`;
-                        copySuccess.style.display = 'block';
-                        setTimeout(function() {
-                            copySuccess.style.display = 'none';
-                            copySuccess.innerHTML = `<i class="fas fa-check-circle"></i> 链接已复制到剪贴板！`;
-                        }, 2200);
-                    }).catch(function(err) {
-                        alert('复制失败，请手动复制链接: ' + url);
-                    });
-                });
-            });
-        }
+        return p;
+    }
+    function pickDish(){
+        let p = effectivePool();
+        if(!p.length) p = currentDishes();
+        if(!p.length) return null;
+        const total = p.reduce((s,d)=>s+(d.weight||1), 0);
+        let r = Math.random()*total;
+        for(const d of p){ r -= (d.weight||1); if(r<=0) return d; }
+        return p[p.length-1];
+    }
+    function pushHistory(name){ history.unshift(name); if(history.length>12) history.length=12; saveHistory(); renderHistory(); }
+    function pickTip(){ return TIPS[Math.floor(Math.random()*TIPS.length)]; }
+    function $(id){ return document.getElementById(id); }
 
-        function createSlotMachine(){
-            reelsContainer.innerHTML=''; reels=[];
-            for(let i=0;i<3;i++){
-                const reel=document.createElement('div'); reel.className='reel';
-                const reelInner=document.createElement('div'); reelInner.className='reel-inner'; reelInner.id=`reel-${i}`;
-                for(let j=0;j<3;j++){
-                    foodItems.forEach((item,index)=>{
-                        const reelItem=document.createElement('div');
-                        reelItem.className=`reel-item ${item.type==='大餐'?'special':''}`;
-                        reelItem.style.backgroundColor=item.color;
-                        reelItem.textContent=item.emoji;
-                        reelItem.setAttribute('data-name',item.name);
-                        reelInner.appendChild(reelItem);
-                    });
-                }
-                const reelGlass=document.createElement('div'); reelGlass.className='reel-glass';
-                reel.appendChild(reelInner); reel.appendChild(reelGlass); reelsContainer.appendChild(reel);
-                reels.push({element:reelInner,position:0,id:i});
-            }
-        }
+    /* ---------- 音效（WebAudio） ---------- */
+    let actx=null;
+    function ac(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return actx; }
+    function beep(freq,dur,type,vol){ if(muted) return; const c=ac(); if(!c) return; const o=c.createOscillator(), g=c.createGain(); o.type=type||'sine'; o.frequency.value=freq; g.gain.value=vol||0.05; o.connect(g); g.connect(c.destination); const t=c.currentTime; o.start(t); g.gain.exponentialRampToValueAtTime(0.0001, t+dur); o.stop(t+dur); }
+    function sndTick(){ beep(760+Math.random()*240, 0.05, 'square', 0.025); }
+    function sndDing(){ beep(1180, 0.28, 'sine', 0.06); }
+    function sndWhoosh(){ beep(280, 0.32, 'sawtooth', 0.04); }
 
-        function createFoodTags(){
-            foodItemsContainer.innerHTML='';
-            foodItems.forEach(item=>{
-                const tag=document.createElement('div');
-                tag.className=`food-tag ${item.type==='大餐'?'special':''}`;
-                tag.innerHTML=`${item.emoji} ${item.name}`;
-                tag.title=item.type;
-                foodItemsContainer.appendChild(tag);
-            });
-        }
+    /* ---------- 分类筛选 ---------- */
+    function renderFilters(){
+        const types=[]; allDishes().forEach(d=>{ if(!types.includes(d.type)) types.push(d.type); });
+        const box=$('filters'); box.innerHTML='';
+        types.forEach(t=>{ const c=document.createElement('button'); c.className='chip'+(activeTypes.has(t)?' active':''); c.textContent=t; c.onclick=()=>{ if(activeTypes.has(t)) activeTypes.delete(t); else activeTypes.add(t); renderFilters(); renderFoodList(); rebuildCurrent(); }; box.appendChild(c); });
+        const all=document.createElement('button'); all.className='chip'+(activeTypes.size===0?' active':''); all.textContent='全部'; all.onclick=()=>{ activeTypes.clear(); renderFilters(); renderFoodList(); rebuildCurrent(); }; box.appendChild(all);
+    }
+    function renderExcludeRow(){
+        const row=$('excludeRow');
+        if(!excluded.size){ row.innerHTML=''; return; }
+        row.innerHTML='已划掉：'+[...excluded].map(n=>'<b>'+n+'</b>').join('、')+'　<button id="clearEx" style="border:none;background:#e74c3c;color:#fff;border-radius:12px;padding:3px 10px;cursor:pointer;font-size:.8rem;">恢复全部</button>';
+        $('clearEx').onclick=()=>{ excluded.clear(); saveExcluded(); renderExcludeRow(); renderFoodList(); rebuildCurrent(); };
+    }
+    function renderFoodList(){
+        const box=$('foodItems'); box.innerHTML='';
+        currentDishes().forEach(d=>{
+            const t=document.createElement('div'); t.className='food-tag'+(excluded.has(d.name)?' excluded':''); t.textContent=d.emoji+' '+d.name; t.title='点击划掉/恢复';
+            t.onclick=()=>{ if(excluded.has(d.name)) excluded.delete(d.name); else excluded.add(d.name); saveExcluded(); renderExcludeRow(); renderFoodList(); rebuildCurrent(); };
+            box.appendChild(t);
+        });
+    }
+    function renderHistory(){
+        const row=$('historyRow');
+        row.innerHTML = history.length ? ('最近：<span>'+history.slice(0,5).join(' · ')+'</span>') : '最近：<span>暂无</span>';
+    }
+    function renderCustom(){
+        const box=$('customList'); box.innerHTML='';
+        if(!customDishes.length){ box.innerHTML='<span class="custom-empty">还没有自定义菜品，添加一道你常吃的吧~</span>'; return; }
+        customDishes.forEach((d,i)=>{
+            const item=document.createElement('div'); item.className='custom-item'; item.innerHTML='<span>'+d.emoji+' '+d.name+'</span>';
+            const del=document.createElement('button'); del.textContent='×'; del.onclick=()=>{ customDishes.splice(i,1); saveCustom(customDishes); renderCustom(); renderFilters(); renderFoodList(); rebuildCurrent(); };
+            item.appendChild(del); box.appendChild(item);
+        });
+    }
+    function addDish(){
+        const inp=$('customName'); const name=inp.value.trim();
+        if(!name) return;
+        customDishes.push({ name, type:'自定义', color:'#7f8c8d', emoji:'🍴' });
+        saveCustom(customDishes); inp.value=''; renderCustom(); renderFilters(); renderFoodList(); rebuildCurrent();
+    }
 
-       function spinSlotMachine(){
-if(isSpinning) return;
-isSpinning = true;
-spinButton.disabled = true;
-resultContainer.style.display = 'none';
+    /* ---------- 老虎机 ---------- */
+    function buildMachine(){
+        const c=$('reelsContainer'); c.innerHTML=''; const dishes=effectivePool(); if(!dishes.length) return;
+        for(let i=0;i<3;i++){ const reel=document.createElement('div'); reel.className='reel'; const inner=document.createElement('div'); inner.className='reel-inner'; inner.id='reel-'+i;
+            for(let k=0;k<3;k++){ dishes.forEach(d=>{ const it=document.createElement('div'); it.className='reel-item'; it.style.backgroundColor=d.color; it.textContent=d.emoji; inner.appendChild(it); }); }
+            const glass=document.createElement('div'); glass.className='reel-glass'; reel.appendChild(inner); reel.appendChild(glass); c.appendChild(reel); }
+    }
+    let machineSpinning=false;
+    function spinMachine(){
+        if(machineSpinning) return; const dishes=effectivePool(); if(!dishes.length){ alert('候选为空，先恢复几道菜~'); return; }
+        machineSpinning=true; $('spinMachine').disabled=true; sndWhoosh();
+        const pick=pickDish(); const ih=93.33, per=dishes.length; const idx=dishes.findIndex(d=>d.name===pick.name);
+        for(let i=0;i<3;i++){ const inner=$('reel-'+i); inner.style.transition='none'; inner.style.top='0px'; void inner.offsetHeight;
+            inner.style.transition='top '+(3+i*0.5)+'s cubic-bezier(0.25,0.1,0.25,1)'; inner.style.top=(-(idx*ih+2*per*ih-ih))+'px';
+            inner.addEventListener('transitionend', function h(){ inner.removeEventListener('transitionend',h); if(i===2){ showResult(pick); machineSpinning=false; $('spinMachine').disabled=false; } }); }
+    }
+    /* ---------- 大转盘 ---------- */
+    let wheelRot=0, wheelSpinning=false;
+    function buildWheel(){
+        const wheel=$('wheel'); const dishes=effectivePool(); const n=dishes.length; wheelRot=0; wheel.style.transition='none'; wheel.style.transform='rotate(0deg)';
+        if(!n){ wheel.innerHTML=''; wheel.style.background='#fff'; return; }
+        const seg=360/n; let grad=[];
+        for(let i=0;i<n;i++){ grad.push(dishes[i].color+' '+(i*seg).toFixed(2)+'deg '+((i+1)*seg).toFixed(2)+'deg'); }
+        wheel.style.background='conic-gradient('+grad.join(',')+')'; wheel.innerHTML='';
+        for(let i=0;i<n;i++){ const lab=document.createElement('div'); lab.className='wheel-label'; lab.textContent=dishes[i].emoji; const ang=i*seg+seg/2; lab.style.transform='rotate('+ang+'deg) translateY(-140px) rotate('+(-ang)+'deg) translate(-50%,-50%)'; wheel.appendChild(lab); }
+    }
+    function spinWheel(){
+        if(wheelSpinning) return; const dishes=effectivePool(); if(!dishes.length){ alert('候选为空，先恢复几道菜~'); return; }
+        wheelSpinning=true; $('spinWheelBtn').disabled=true; sndTick();
+        const n=dishes.length, seg=360/n; const land=Math.floor(Math.random()*n); const landRot=360-(land*seg+seg/2); const cur=((wheelRot%360)+360)%360; let delta=((landRot-cur)%360+360)%360; wheelRot+=360*6+delta;
+        $('wheel').style.transition='transform 4.5s cubic-bezier(0.17,0.67,0.12,0.99)'; $('wheel').style.transform='rotate('+wheelRot+'deg)';
+        $('wheel').addEventListener('transitionend', function h(){ $('wheel').removeEventListener('transitionend',h); showResult(dishes[land]); wheelSpinning=false; $('spinWheelBtn').disabled=false; });
+    }
+    /* ---------- 骰子 ---------- */
+    const PIP_MAP={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+    function drawDie(el,val){ el.innerHTML=''; for(let i=0;i<9;i++){ const p=document.createElement('div'); p.className='pip '+(PIP_MAP[val].includes(i)?'on':'off'); el.appendChild(p); } }
+    let rolling=false;
+    function rollDice(){
+        if(rolling) return; const dishes=effectivePool(); if(!dishes.length){ alert('候选为空，先恢复几道菜~'); return; }
+        rolling=true; $('rollDiceBtn').disabled=true; let ticks=0;
+        const timer=setInterval(()=>{ drawDie($('die1'),1+Math.floor(Math.random()*6)); drawDie($('die2'),1+Math.floor(Math.random()*6)); sndTick(); if(++ticks>10){ clearInterval(timer); const d1=1+Math.floor(Math.random()*6), d2=1+Math.floor(Math.random()*6); drawDie($('die1'),d1); drawDie($('die2'),d2); const land=(d1+d2-2)%dishes.length; showResult(dishes[land]); rolling=false; $('rollDiceBtn').disabled=false; } },80);
+    }
+    /* ---------- 刮刮乐 ---------- */
+    let scratchRevealed=false;
+    function buildScratch(){
+        const dish=pickDish(); if(!dish){ alert('候选为空'); return; }
+        $('scratchPrize').querySelector('.em').textContent=dish.emoji; $('scratchPrize').querySelector('.nm').textContent=dish.name;
+        const cv=$('scratchCanvas'); const ctx=cv.getContext('2d'); ctx.globalCompositeOperation='source-over'; ctx.fillStyle='#9aa5b1'; ctx.fillRect(0,0,cv.width,cv.height);
+        ctx.fillStyle='#cfd8e3'; for(let i=0;i<40;i++){ ctx.beginPath(); ctx.arc(Math.random()*cv.width,Math.random()*cv.height,Math.random()*10+4,0,7); ctx.fill(); }
+        ctx.fillStyle='#6b7280'; ctx.font='bold 20px sans-serif'; ctx.textAlign='center'; ctx.fillText('刮开我', cv.width/2, cv.height/2+7);
+        scratchRevealed=false; cv.style.display='block'; cv.onpointerdown=null; cv.onpointermove=null;
+        let drawing=false;
+        function pos(e){ const r=cv.getBoundingClientRect(); return { x:(e.clientX-r.left)*(cv.width/r.width), y:(e.clientY-r.top)*(cv.height/r.height) }; }
+        function scratchAt(p){ ctx.globalCompositeOperation='destination-out'; ctx.beginPath(); ctx.arc(p.x,p.y,18,0,7); ctx.fill(); ctx.globalCompositeOperation='source-over'; }
+        function pct(){ const d=ctx.getImageData(0,0,cv.width,cv.height).data; let cl=0; for(let i=3;i<d.length;i+=4){ if(d[i]===0) cl++; } return cl/(d.length/4); }
+        cv.onpointerdown=(e)=>{ drawing=true; scratchAt(pos(e)); sndTick(); };
+        cv.onpointermove=(e)=>{ if(!drawing) return; scratchAt(pos(e)); if(Math.random()<0.3) sndTick(); if(!scratchRevealed && pct()>0.6) finishScratch(dish); };
+        cv.onpointerup=()=>{ drawing=false; }; cv.onpointerleave=()=>{ drawing=false; };
+    }
+    function finishScratch(dish){ if(scratchRevealed) return; scratchRevealed=true; $('scratchCanvas').style.display='none'; showResult(dish); }
+    /* ---------- 抽签筒 ---------- */
+    function drawStick(){
+        const dish=pickDish(); if(!dish){ alert('候选为空'); return; }
+        const tube=$('stickTube'); tube.classList.remove('shake'); void tube.offsetWidth; tube.classList.add('shake'); sndWhoosh();
+        setTimeout(()=>{ const fortune=FORTUNES[Math.floor(Math.random()*FORTUNES.length)];
+            $('stickResultWrap').innerHTML='<div class="stick-result"><div class="em">'+dish.emoji+'</div><div class="nm">'+dish.name+'</div><div class="fortune">签文：'+fortune+'</div><button class="spin-button" id="stickToResult" style="margin-top:12px;padding:10px 28px;font-size:1rem;">就这个！</button></div>';
+            $('stickToResult').onclick=()=>showResult(dish);
+        }, 520);
+    }
+    /* ---------- 翻牌 ---------- */
+    let flipLocked=false;
+    function buildFlip(){
+        const dishes=effectivePool(); if(!dishes.length){ alert('候选为空'); return; }
+        const pool=dishes.slice(); for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+        const N=Math.min(6, pool.length); const pick=pool.slice(0,N);
+        const grid=$('flipGrid'); grid.innerHTML=''; flipLocked=false;
+        pick.forEach(d=>{ const card=document.createElement('div'); card.className='flip-card'; card.innerHTML='<div class="flip-inner"><div class="flip-face flip-back"><i class="fas fa-question"></i></div><div class="flip-face flip-front"><div class="em">'+d.emoji+'</div><div class="nm">'+d.name+'</div></div></div>';
+            card.onclick=()=>{ if(flipLocked) return; card.classList.add('flipped'); flipLocked=true; sndDing(); setTimeout(()=>showResult(d), 450); };
+            grid.appendChild(card);
+        });
+    }
+    /* ---------- 抽卡 SSR ---------- */
+    function rollRarity(){ const r=Math.random(); if(r<0.05) return 'SSR'; if(r<0.30) return 'SR'; return 'R'; }
+    function drawGacha(){
+        const dish=pickDish(); if(!dish){ alert('候选为空'); return; }
+        const rarity=rollRarity(); sndDing();
+        const cls = rarity==='SSR'?'rarity-SSR':rarity==='SR'?'rarity-SR':'rarity-R';
+        $('gachaResultWrap').innerHTML='<div class="gacha-result '+cls+'"><div class="em">'+dish.emoji+'</div><div class="nm">'+dish.name+'</div><div class="rar">'+rarity+'</div><button class="spin-button" id="gachaToResult" style="margin-top:12px;padding:10px 28px;font-size:1rem;">就这个！</button></div>';
+        $('gachaToResult').onclick=()=>showResult(dish);
+    }
+    /* ---------- 结果弹窗 ---------- */
+    function showResult(food){
+        if(!food) return; lastFood=food; pushHistory(food.name);
+        $('rmEmoji').textContent=food.emoji; $('rmName').textContent=food.name; $('rmTip').textContent=pickTip();
+        $('rmCouponQr').src=COUPON_QR; $('rmPageQr').src=QR_API+encodeURIComponent(location.href);
+        $('resultModal').classList.add('show');
+    }
+    function closeModal(){ $('resultModal').classList.remove('show'); }
+    function share(){ const data={ title:'今天吃啥', text:'不如吃 '+lastFood.name+'？', url:location.href }; if(navigator.share){ navigator.share(data).catch(()=>{}); } else { navigator.clipboard.writeText(location.href).then(showToast).catch(()=>alert('链接：'+location.href)); } }
+    function showToast(){ const t=$('copyToast'); t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
+    /* ---------- 今日老黄历 ---------- */
+    const JIANCHU = [
+        {n:'建', yi:'祭祀 祈福 出行 纳财', ji:'动土 破土 安葬'},
+        {n:'除', yi:'除服 疗病 出行 拆卸', ji:'求财 嫁娶 开市'},
+        {n:'满', yi:'祭祀 祈福 开市 交易', ji:'服药 栽种 安葬'},
+        {n:'平', yi:'修饰 装修 平治 出行', ji:'祈福 求嗣 开渠'},
+        {n:'定', yi:'订婚 纳采 立约 入学', ji:'诉讼 出行 移徙'},
+        {n:'执', yi:'捕捉 结网 求医 栽种', ji:'开市 交易 移徙'},
+        {n:'破', yi:'破屋 求医 拆卸 沐浴', ji:'嫁娶 开市 动土'},
+        {n:'危', yi:'安床 祭祀 祈福', ji:'登高 乘船 出行'},
+        {n:'成', yi:'开市 嫁娶 入学 立约', ji:'诉讼 争讼 破土'},
+        {n:'收', yi:'纳财 收账 进人口 捕捉', ji:'开市 出行 安葬'},
+        {n:'开', yi:'开市 交易 入学 出行 嫁娶', ji:'安葬 破土 服药'},
+        {n:'闭', yi:'安葬 筑堤 埋穴 塞穴', ji:'开市 出行 手术'}
+    ];
+    function lunarText(){
+        try{ return new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{dateStyle:'long'}).format(new Date()); }
+        catch(e){ try{ return new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{year:'numeric',month:'long',day:'2-digit'}).format(new Date()); }catch(e2){ return ''; } }
+    }
+    function zodiacText(){
+        try{
+            const y=new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{year:'numeric'}).format(new Date());
+            const B={子:'鼠',丑:'牛',寅:'虎',卯:'兔',辰:'龙',巳:'蛇',午:'马',未:'羊',申:'猴',酉:'鸡',戌:'狗',亥:'猪'};
+            for(const k in B){ if(y.indexOf(k)>=0) return B[k]; }
+            return '';
+        }catch(e){ return ''; }
+    }
+    function almanac(){ const n=new Date(); const dayNo=Math.floor(Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())/86400000); return JIANCHU[((dayNo%12)+12)%12]; }
 
-const randomIndex = Math.floor(Math.random() * foodItems.length);
-const selectedFood = foodItems[randomIndex];
-
-debugInfo.innerHTML = `选中: ${selectedFood.name}`;
-debugInfo.style.display = 'block';
-
-const itemHeight = 100;
-const itemsPerReel = foodItems.length;
-
-reels.forEach((reel, reelIndex) => {
-    const foodPosition = foodItems.findIndex(item => item.name === selectedFood.name);
-    const middleOffset = itemHeight; // 让选中格在中间
-    const stopPosition = -(foodPosition * itemHeight + 2 * itemsPerReel * itemHeight - middleOffset);
-
-    // 先重置
-    reel.element.style.transition = 'none';
-    reel.element.style.top = '0px';
-    void reel.element.offsetHeight;
-
-    // 设置动画
-    reel.element.style.transition = `top ${3 + reelIndex * 0.5}s cubic-bezier(0.25,0.1,0.25,1)`;
-    reel.element.style.top = stopPosition + 'px';
-
-    // 动画结束监听
-    reel.element.addEventListener('transitionend', function handler() {
-        reel.element.removeEventListener('transitionend', handler);
-        if (reelIndex === reels.length - 1) { // 最后一个滚轮停下时
-            resultContent.textContent = selectedFood.emoji + " " + selectedFood.name;
-            resultContainer.style.display = 'block';
-            spinButton.disabled = false;
-            isSpinning = false;
-            debugInfo.style.display = 'none';
-        }
-    });
+    /* ---------- 菜单海报 ---------- */
+    function loadImg(src){ return new Promise((res,rej)=>{ const im=new Image(); im.crossOrigin='anonymous'; im.onload=()=>res(im); im.onerror=()=>rej(new Error('img load fail')); im.src=src; }); }
+    function drawRound(x,px,py,w,h,r,fill){ x.beginPath(); x.moveTo(px+r,py); x.arcTo(px+w,py,px+w,py+h,r); x.arcTo(px+w,py+h,px,py+h,r); x.arcTo(px,py+h,px,py,r); x.arcTo(px,py,px+w,py,r); x.closePath(); if(fill){ x.fillStyle=fill; x.fill(); } }
+    function drawImgFit(x,im,px,py,size){ drawRound(x,px-5,py-5,size+10,size+10,10,'#fff'); x.drawImage(im,px,py,size,size); }
+    function drawQrPlaceholder(x,px,py,size,label){ drawRound(x,px-5,py-5,size+10,size+10,10,'#fff'); x.fillStyle='#eef2f6'; x.fillRect(px,py,size,size); x.fillStyle='#95a5a6'; x.font='13px "Microsoft YaHei",sans-serif'; x.textAlign='center'; x.fillText(label, px+size/2, py+size/2); }
+    function openPoster(){ if(!lastFood) return; $('posterModal').classList.add('show'); $('posterImg').src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; $('posterDl').href='#'; buildPoster(); }
+    function closePoster(){ $('posterModal').classList.remove('show'); }
+    function buildPoster(){
+        const W=600,H=920; const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d');
+        const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,'#fff7ec'); g.addColorStop(1,'#ffe2c4'); x.fillStyle=g; x.fillRect(0,0,W,H);
+        x.fillStyle='#e74c3c'; x.fillRect(0,0,W,12); x.fillStyle='#f39c12'; x.fillRect(0,H-12,W,12);
+        x.textAlign='center';
+        x.fillStyle='#d35400'; x.font='bold 42px "Microsoft YaHei",sans-serif'; x.fillText('今天吃啥', W/2, 74);
+        const now=new Date();
+        x.fillStyle='#7f8c8d'; x.font='20px "Microsoft YaHei",sans-serif';
+        x.fillText(now.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'}), W/2, 108);
+        const lun=lunarText(); const z=zodiacText(); if(lun) x.fillText('农历 '+lun+(z?('（'+z+'年）'):''), W/2, 138);
+        // 菜品卡
+        drawRound(x,40,165,W-80,240,20,'#ffffff');
+        x.font='120px sans-serif'; x.fillText(lastFood.emoji, W/2, 288);
+        x.fillStyle='#2c3e50'; x.font='bold 54px "Microsoft YaHei",sans-serif'; x.fillText(lastFood.name, W/2, 356);
+        x.fillStyle='#7f8c8d'; x.font='22px "Microsoft YaHei",sans-serif'; x.fillText($('rmTip').textContent, W/2, 392);
+        // 老黄历卡
+        const al=almanac();
+        drawRound(x,40,425,W-80,168,20,'#fff4e0');
+        x.fillStyle='#c0392b'; x.font='bold 24px "Microsoft YaHei",sans-serif'; x.fillText('今日黄历 · 建'+al.n+'日', W/2, 462);
+        x.textAlign='left';
+        x.fillStyle='#27ae60'; x.font='bold 22px "Microsoft YaHei",sans-serif'; x.fillText('宜', 70, 508);
+        x.fillStyle='#2c3e50'; x.font='22px "Microsoft YaHei",sans-serif'; x.fillText(al.yi, 112, 508);
+        x.fillStyle='#c0392b'; x.font='bold 22px "Microsoft YaHei",sans-serif'; x.fillText('忌', 70, 548);
+        x.fillStyle='#2c3e50'; x.font='22px "Microsoft YaHei",sans-serif'; x.fillText(al.ji, 112, 548);
+        x.textAlign='center';
+        // 二维码区
+        x.fillStyle='#95a5a6'; x.font='18px "Microsoft YaHei",sans-serif'; x.fillText('扫码用小程序 / 打开本页', W/2, 636);
+        const QS=130, ly=660, lx=140, rx=330;
+        const pageSrc='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='+encodeURIComponent(location.href);
+        const jobs=[];
+        // 小程序码：复用页面同一个 MINIAPP_QR 常量（底部推广条 + 本海报），无需单独配置
+        if(MINIAPP_QR){ jobs.push(loadImg(MINIAPP_QR).then(im=>drawImgFit(x,im,lx,ly,QS)).catch(()=>drawQrPlaceholder(x,lx,ly,QS,'小程序码'))); }
+        else { drawQrPlaceholder(x,lx,ly,QS,'小程序码'); }
+        jobs.push(loadImg(pageSrc).then(im=>drawImgFit(x,im,rx,ly,QS)).catch(()=>drawQrPlaceholder(x,rx,ly,QS,'页面二维码')));
+        Promise.all(jobs).then(()=>{
+            x.fillStyle='#7f8c8d'; x.font='16px "Microsoft YaHei",sans-serif'; x.textAlign='center';
+            x.fillText('小程序码', lx+QS/2, ly+QS+26);
+            x.fillText('本页二维码', rx+QS/2, ly+QS+26);
+            x.fillStyle='#d35400'; x.font='bold 20px "Microsoft YaHei",sans-serif'; x.fillText('扫码领券更划算 · injd.cn', W/2, 876);
+            const url=cv.toDataURL('image/png'); $('posterImg').src=url; $('posterDl').href=url;
+        }).catch(()=>{});
+    }
+    /* ---------- 商业化弹窗 ---------- */
+    function openPromo(){
+        $('promoCoupon').src=COUPON_QR;
+        $('promoModal').classList.add('show');
+    }
+    function closePromo(){ $('promoModal').classList.remove('show'); }
+    /* ---------- 模式切换 ---------- */
+    function rebuildCurrent(){ if(mode==='machine') buildMachine(); else if(mode==='wheel') buildWheel(); else if(mode==='scratch') buildScratch(); else if(mode==='flip') buildFlip(); }
+    function scrollTop(){ try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); } }
+    function showMode(m){
+        mode=m;
+        document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden'));
+        if(m==='menu'){ scrollTop(); return; }
+        if(m==='quick'){ const d=pickDish(); if(d) showResult(d); else alert('候选为空'); scrollTop(); return; }
+        const map={ machine:'machineSection', wheel:'wheelSection', dice:'diceSection', scratch:'scratchSection', sticks:'sticksSection', flip:'flipSection', gacha:'gachaSection' };
+        $(map[m]).classList.remove('hidden');
+        if(m==='machine') buildMachine();
+        else if(m==='wheel') buildWheel();
+        else if(m==='scratch') buildScratch();
+        else if(m==='flip') buildFlip();
+        else if(m==='sticks'){ $('stickResultWrap').innerHTML=''; }
+        else if(m==='gacha'){ $('gachaResultWrap').innerHTML=''; }
+        setTimeout(()=>{ try{ $('playArea').scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){} }, 60);
+    }
+    /* ---------- 绑定 ---------- */
+    document.querySelectorAll('.mode-card').forEach(c=> c.onclick=()=>showMode(c.dataset.mode));
+    document.querySelectorAll('[data-back]').forEach(b=> b.onclick=()=>showMode('menu'));
+    $('spinMachine').onclick=spinMachine;
+    $('spinWheelBtn').onclick=spinWheel;
+    $('rollDiceBtn').onclick=rollDice;
+    $('scratchAgain').onclick=()=>{ buildScratch(); };
+    $('drawStickBtn').onclick=drawStick;
+    $('flipAgain').onclick=()=>{ buildFlip(); };
+    $('drawGachaBtn').onclick=drawGacha;
+    $('addDishBtn').onclick=addDish;
+    $('customName').addEventListener('keydown', e=>{ if(e.key==='Enter') addDish(); });
+    $('avoidRecent').onchange=(e)=>{ avoidRecent=e.target.checked; };
+    $('soundToggle').onclick=()=>{ muted=!muted; localStorage.setItem(MUTE_KEY, muted?'1':'0'); $('soundToggle').innerHTML='<i class="fas fa-volume-'+(muted?'mute':'up')+'"></i>'; if(!muted) sndDing(); };
+    $('rmClose').onclick=closeModal;
+    $('rmAgain').onclick=()=>{ closeModal(); if(mode==='machine') spinMachine(); else if(mode==='wheel') spinWheel(); else if(mode==='dice') rollDice(); else if(mode==='scratch') buildScratch(); else if(mode==='flip') buildFlip(); else if(mode==='sticks') drawStick(); else if(mode==='gacha') drawGacha(); else { const d=pickDish(); if(d) showResult(d); } };
+    $('rmOk').onclick=closeModal;
+    $('rmShare').onclick=share;
+    $('rmCardBtn').onclick=openPoster;
+    $('rmCouponQr').onclick=openPromo;
+    $('posterClose').onclick=closePoster;
+    $('posterModal').addEventListener('click', e=>{ if(e.target===$('posterModal')) closePoster(); });
+    $('resultModal').addEventListener('click', e=>{ if(e.target===$('resultModal')) closeModal(); });
+    $('promoBar').onclick=openPromo;
+    $('promoClose').onclick=closePromo;
+    $('promoModal').addEventListener('click', e=>{ if(e.target===$('promoModal')) closePromo(); });
+    /* ---------- 初始化 ---------- */
+    drawDie($('die1'),3); drawDie($('die2'),4);
+    $('soundToggle').innerHTML='<i class="fas fa-volume-'+(muted?'mute':'up')+'"></i>';
+    $('pbCoupon').src=COUPON_QR;
+    $('dateDisplay').textContent=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+    renderFilters(); renderExcludeRow(); renderFoodList(); renderHistory(); renderCustom();
 });
-}
-
-        // 初始化
-        createSlotMachine();
-        createFoodTags();
-        spinButton.addEventListener('click', spinSlotMachine);
-
-        // 日期显示
-        const dateDisplay = document.getElementById('dateDisplay');
-        const today = new Date();
-        dateDisplay.textContent = today.toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric',weekday:'long'});
-        
-        // 初始化分享功能
-        updateShareHint();
-        initShareFunctions();
-    });
 </script>
 </body>
 </html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>视频链接 → 嵌入代码生成器</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#fff; --ink:#1f2329; --sub:#5b6573;
+    --line:#e5e9f0; --accent:#1677ff; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+    --code-bg:#0f172a; --code-ink:#e2e8f0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.6;font-size:15px}
+  .wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+  h1{font-size:24px;margin:0 0 6px}
+  .tag{display:inline-block;background:#eaf2ff;color:var(--accent);border-radius:6px;
+    padding:2px 9px;font-size:12px;margin-right:6px}
+  .lead{color:var(--sub);margin:8px 0 16px}
+  h2{font-size:19px;margin:34px 0 12px;border-left:4px solid var(--accent);padding-left:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:16px 18px;margin:14px 0;box-shadow:0 1px 3px rgba(20,30,50,.04)}
+  textarea{width:100%;min-height:96px;border:1px solid var(--line);border-radius:10px;
+    padding:12px;font-size:14px;font-family:inherit;resize:vertical}
+  .opts{display:flex;flex-wrap:wrap;gap:12px 16px;margin:12px 0;align-items:center}
+  .opts label{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--sub)}
+  .opts input[type=number]{width:64px;border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+  button.gen{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 22px;
+    font-size:15px;cursor:pointer;font-weight:600}
+  button.gen:hover{filter:brightness(1.05)}
+  /* 结果 / 预览 */
+  .out{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0;background:#fbfcfe}
+  .out .meta{font-size:13.5px;color:var(--sub);margin-bottom:8px}
+  .badge{display:inline-block;padding:1px 9px;border-radius:20px;font-size:12px;font-weight:600}
+  .b-ok{background:#e7f7ec;color:var(--ok)} .b-warn{background:#fdf1e1;color:var(--warn)} .b-bad{background:#fdeaea;color:var(--bad)}
+  .copy{float:right;background:#eef1f5;border:none;border-radius:6px;padding:3px 10px;
+    cursor:pointer;font-size:12px;color:var(--sub)}
+  .copy:hover{background:#e2e8f0}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:12px 14px;border-radius:10px;
+    overflow:auto;font-size:13px;margin:6px 0}
+  pre code{font-family:"SFMono-Regular",Consolas,Menlo,monospace}
+  .note{font-size:13px;color:var(--sub);background:#f3f6fb;border-left:3px solid var(--accent);
+    padding:8px 12px;border-radius:6px;margin:8px 0}
+  .restrict{font-size:13px;color:#7a3b00;background:#fdf6ec;border-left:3px solid var(--warn);
+    padding:8px 12px;border-radius:6px;margin-top:8px}
+  /* 预览：统一 16:9 自适应，修复之前黑框/尺寸异常 */
+  .preview{margin-top:10px}
+  .preview iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:8px;background:#000;display:block}
+  /* 其他说明 */
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden;font-size:13.5px}
+  th,td{border-bottom:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#f0f4fa;color:var(--sub);font-weight:600}
+  tr:last-child td{border-bottom:none}
+  code{background:#eef1f5;padding:1px 6px;border-radius:5px;font-size:13px;
+    font-family:"SFMono-Regular",Consolas,Menlo,monospace}
+  footer{margin-top:46px;color:var(--sub);font-size:12.5px;border-top:1px solid var(--line);padding-top:14px}
+  a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>视频链接 → 嵌入代码生成器</h1>
+    <p>
+      <span class="tag">覆盖 12 平台</span>
+      <span class="tag">自动识别</span>
+      <span class="tag">即贴即生成</span>
+    </p>
+    <p class="lead">粘贴视频链接（每行一个），自动识别平台并生成可直接嵌入第三方网站的 <code>&lt;iframe&gt;</code> 代码，下方实时预览播放效果。</p>
+  </header>
+
+  <!-- ① 输入框 -->
+  <div class="card">
+    <textarea id="urls" placeholder="https://www.youtube.com/watch?v=abcdEFGhijk&#10;https://www.bilibili.com/video/BV1xx411c7mu&#10;https://v.qq.com/x/cover/xxx/vid.html"></textarea>
+    <div class="opts">
+      <label><input type="checkbox" id="optAutoplay"> 自动播放</label>
+      <label><input type="checkbox" id="optMuted"> 静音</label>
+      <label><input type="checkbox" id="optLoop"> 循环</label>
+      <label><input type="checkbox" id="optPrivacy"> YouTube 隐私增强</label>
+      <label>起始秒 <input type="number" id="optStart" value="0" min="0"></label>
+      <label>B站分P <input type="number" id="optPage" value="1" min="1"></label>
+    </div>
+    <button class="gen" id="btnGen">生成嵌入代码</button>
+    <div id="output"></div>
+  </div>
+
+  <!-- ② 其他重要说明 -->
+  <h2>其他重要说明</h2>
+
+  <h3 style="margin:14px 0 8px;font-size:16px">各平台嵌入支持总览</h3>
+  <table>
+    <thead>
+      <tr><th>平台</th><th>可嵌入</th><th>自动生成</th><th>主要限制</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>YouTube</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-ok">支持</span></td><td>上传者可关嵌入；年龄限制视频外站不可播</td></tr>
+      <tr><td>Vimeo</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-ok">支持</span></td><td>上传者可限制嵌入域名（最多 50 个）</td></tr>
+      <tr><td>Bilibili</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-ok">支持</span></td><td>需开启“允许嵌入”；移动端需自行适配</td></tr>
+      <tr><td>腾讯视频</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-ok">支持</span></td><td>需开启“允许外链播放”；vid 区分大小写</td></tr>
+      <tr><td>优酷</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-warn">受限</span></td><td>已停 HTML5 嵌入；需开启嵌入权限</td></tr>
+      <tr><td>爱奇艺</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-bad">不可靠</span></td><td>自动拼地址常失效，建议用官方“通用代码”</td></tr>
+      <tr><td>抖音</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-warn">需 ID</span></td><td>须“公开”；需 referrerpolicy；无自适应</td></tr>
+      <tr><td>TikTok</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-ok">支持</span></td><td>仅公开视频；删除即失效</td></tr>
+      <tr><td>Facebook</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-ok">支持</span></td><td>须用视频页链接（/videos/、/watch、/reel、fb.watch）</td></tr>
+      <tr><td>Dailymotion</td><td><span class="badge b-ok">支持</span></td><td><span class="badge b-ok">支持</span></td><td>上传者可限域名；地区版权限制</td></tr>
+      <tr><td>微信视频号</td><td><span class="badge b-bad">不支持</span></td><td><span class="badge b-bad">不适用</span></td><td>X-Frame-Options 禁止外站嵌套</td></tr>
+      <tr><td>1905 电影网</td><td><span class="badge b-bad">不支持</span></td><td><span class="badge b-bad">不适用</span></td><td>无嵌入入口；地址带动态签名/防盗链</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note" style="margin-top:14px">
+    <b>常见坑（生成前必读）：</b><br>
+    • <b>腾讯视频“vid参数非法”</b>：从“分享”复制的若是封面/合集页（<code>v.qq.com/x/cover/&lt;合集ID&gt;.html</code>），其 ID 不是视频 vid。请点开具体某一集，复制形如 <code>v.qq.com/x/cover/&lt;合集ID&gt;/&lt;vid&gt;.html</code> 或 <code>v.qq.com/x/page/&lt;vid&gt;.html</code> 的地址。<br>
+    • <b>Facebook 不生成</b>：照片/主页/普通帖子链接不是视频页，本工具不会生成无效嵌入；请改用含 <code>/videos/</code>、<code>/watch</code>、<code>/reel/</code> 或 <code>fb.watch</code> 的视频页链接。
+  </div>
+
+  <div class="note">
+    <b>可复用函数：</b>同款逻辑已拆为独立文件，可直接集成到你的项目——
+    <code>embed-generator.js</code>（浏览器/Node 通用，<code>VideoEmbedGen.generateEmbedCode(url, opts)</code>）与
+    <code>embed_generator.py</code>（<code>generate_embed_code(url, **opts)</code>）。
+    返回结构含 <code>platform_cn / supported / iframe / restrictions / note</code>。
+  </div>
+
+  <footer>
+    调研日期 2026-09-12。嵌入能否最终播放取决于视频上传者在各平台设置的隐私与版权开关，上线前请在目标域名实测。<br>
+    <a href="../tools.html">← 返回小工具集</a>
+  </footer>
+
+</div>
+
+<script src="embed-generator.js"></script>
+<script>
+/* 检测逻辑在 embed-generator.js（UMD，单一事实来源）；本页只负责交互与渲染。 */
+document.getElementById('btnGen').addEventListener('click', function(){
+  var raw = document.getElementById('urls').value.trim();
+  var lines = raw.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean);
+  var out = document.getElementById('output');
+  out.innerHTML = '';
+  if(!lines.length){ out.innerHTML = '<div class="note">请先粘贴至少一个视频链接。</div>'; return; }
+
+  var opts = {
+    autoplay: document.getElementById('optAutoplay').checked,
+    muted: document.getElementById('optMuted').checked,
+    loop: document.getElementById('optLoop').checked,
+    privacy_enhanced: document.getElementById('optPrivacy').checked,
+    start: document.getElementById('optStart').value,
+    page: document.getElementById('optPage').value
+  };
+
+  lines.forEach(function(line){
+    var res = VideoEmbedGen.generateEmbedCode(line, opts);
+    var div = document.createElement('div');
+    div.className = 'out';
+
+    var status = res.supported
+      ? '<span class="badge b-ok">支持嵌入</span>'
+      : '<span class="badge b-bad">不支持 / 未识别</span>';
+    var html = '<div class="meta"><b>平台：</b>' + res.platform_cn + ' ｜ ' + status + '</div>';
+
+    if(res.iframe){
+      html += '<button class="copy" data-code="' + encodeURIComponent(res.iframe) + '">复制代码</button>';
+      html += '<pre><code>' + escapeHtml(res.iframe) + '</code></pre>';
+      // 预览：去掉原 iframe 的 width/height 属性，交给 CSS 统一 16:9 自适应
+      var pv = res.iframe.replace(/\swidth="\d+"/g, '').replace(/\sheight="\d+"/g, '');
+      html += '<div class="preview">' + pv + '</div>';
+      html += '<div class="note">预览为最佳努力渲染；若显示空白/报错，多为该平台禁止第三方页面嵌套（X-Frame-Options），但复制的代码嵌入到你自己的网站通常正常。</div>';
+      html += '<div class="restrict"><b>限制：</b>' + res.restrictions + '</div>';
+    } else {
+      html += '<div class="restrict"><b>说明：</b>' + res.restrictions + '</div>';
+    }
+    if(res.note){ html += '<div class="note">' + res.note + '</div>'; }
+
+    div.innerHTML = html;
+    out.appendChild(div);
+  });
+
+  out.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var code = decodeURIComponent(btn.getAttribute('data-code'));
+      navigator.clipboard.writeText(code).then(function(){
+        btn.textContent = '已复制';
+        setTimeout(function(){ btn.textContent = '复制代码'; }, 1200);
+      }).catch(function(){
+        btn.textContent = '复制失败';
+      });
+    });
+  });
+});
+
+function escapeHtml(s){
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+</script>
+</body>
+</html>

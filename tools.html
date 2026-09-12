@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小工具集 · aivrz</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#fff; --ink:#1f2329; --sub:#5b6573; --line:#e5e9f0; --accent:#1677ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.6;padding:28px 20px 70px}
+  .wrap{max-width:960px;margin:0 auto}
+  header h1{font-size:26px;margin:0 0 6px}
+  header p{color:var(--sub);margin:4px 0}
+  .tag{display:inline-block;background:#eaf2ff;color:var(--accent);border-radius:6px;padding:2px 10px;font-size:12px;margin-right:6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:24px}
+  .tool{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(20,30,50,.05);transition:.15s}
+  .tool:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(22,119,255,.12);border-color:var(--accent)}
+  .tool .ic{font-size:26px;margin-bottom:8px}
+  .tool h3{margin:6px 0 4px;font-size:17px}
+  .tool p{margin:0;color:var(--sub);font-size:13.5px}
+  .tool .go{margin-top:10px;color:var(--accent);font-size:13px;font-weight:600}
+  footer{margin-top:50px;color:var(--sub);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  a.back{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>小工具集</h1>
+    <p><span class="tag">GitHub Pages</span><span class="tag">纯静态</span><span class="tag">即用即走</span></p>
+    <p>这里汇总托管在 <code>aivrz.github.io</code> 下的各类轻量静态小工具。每个工具都是一个独立文件夹，打开即用，无需后端。</p>
+  </header>
+
+  <!-- 新增工具时，复制下面任意一个 .tool 卡片并修改链接/文案即可 -->
+  <div class="grid">
+    <a class="tool" href="index.html">
+      <div class="ic">🎰</div>
+      <h3>美食老虎机</h3>
+      <p>今天吃啥？一键随机推荐美食，带分享与二维码。</p>
+      <div class="go">打开 →</div>
+    </a>
+
+    <a class="tool" href="vcode/index.html">
+      <div class="ic">🎞️</div>
+      <h3>视频嵌入代码生成器</h3>
+      <p>粘贴视频链接，自动识别平台并返回可嵌入的 iframe 代码；含各平台限制与“vid 非法”等常见坑排查。</p>
+      <div class="go">打开 →</div>
+    </a>
+
+    <!-- 示例占位（上线后删掉或替换为真实工具）
+    <a class="tool" href="another-tool/index.html">
+      <div class="ic">🛠️</div>
+      <h3>新工具</h3>
+      <p>一句话描述这个工具的用途。</p>
+      <div class="go">打开 →</div>
+    </a>
+    -->
+  </div>
+
+  <footer>
+    返回 <a class="back" href="index.html">首页（美食老虎机）</a> ｜ 小工具集为纯静态页面，可直接部署到 GitHub Pages。
+  </footer>
+</div>
+</body>
+</html>
