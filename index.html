@@ -170,6 +170,8 @@
         .poster-dl { display:inline-block; background:linear-gradient(to right,#3498db,#2980b9); color:#fff; padding:10px 28px; border-radius:50px; text-decoration:none; font-size:0.95rem; box-shadow:0 6px 16px rgba(52,152,219,0.4); }
 
         footer { margin-top:6px; color:#7f8c8d; font-size:0.8rem; padding:12px; text-align:center; }
+        footer .more-tools { display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:7px 18px; border-radius:50px; background:rgba(255,255,255,0.78); border:1px solid rgba(211,84,0,0.28); color:#d35400; font-size:0.82rem; font-weight:600; text-decoration:none; box-shadow:0 3px 10px rgba(211,84,0,0.12); transition:background .16s ease, border-color .16s ease, transform .16s ease, box-shadow .16s ease; }
+        footer .more-tools:hover { background:#fff; border-color:#d35400; transform:translateY(-2px); box-shadow:0 6px 16px rgba(211,84,0,0.2); }
         .copy-toast { position:fixed; top:18px; left:50%; transform:translateX(-50%); background:rgba(46,204,113,0.92); color:#fff; padding:11px 20px; border-radius:50px; box-shadow:0 5px 15px rgba(0,0,0,0.2); z-index:1001; display:none; }
     </style>
 </head>
@@ -256,7 +258,7 @@
         </details>
     </div>
 
-    <footer>© 2023-现在 今天吃啥 · 决策游戏合集（免费工具）</footer>
+    <footer>© 2023-现在 今天吃啥 · 决策游戏合集（免费工具）<br><a class="more-tools" href="tools.html"><i class="fas fa-compass"></i> 更多小工具 →</a></footer>
     <div class="copy-toast" id="copyToast"><i class="fas fa-check-circle"></i> 已复制，去分享吧~</div>
 
     <!-- 底部商业化常驻条 -->

@@ -1,0 +1,40 @@
+{
+  "_title": "aivrz · 网址导航",
+  "_subtitle": "小工具 · 常用站点 · 资源收藏",
+  "_footer": "纯静态页面 · 修改 nav.json 即可更新本页导航，无需改动 HTML",
+
+  "本站工具": [
+    { "name": "美食老虎机", "url": "index.html", "icon": "fa-solid fa-dice", "desc": "今天吃啥？老虎机 / 大转盘 / 刮刮乐 多玩法随机决策" },
+    { "name": "视频嵌入生成器", "url": "vcode/index.html", "icon": "fa-solid fa-film", "desc": "粘贴视频链接，自动识别平台并生成可嵌入的 iframe 代码" }
+  ],
+
+  "开发工具": [
+    { "name": "GitHub", "url": "https://github.com/", "icon": "fa-brands fa-github", "desc": "全球最大的代码托管与协作平台" },
+    { "name": "MDN Web Docs", "url": "https://developer.mozilla.org/zh-CN/", "icon": "fa-solid fa-book", "desc": "Web 开发权威文档，前端必备" },
+    { "name": "Can I use", "url": "https://caniuse.com/", "icon": "fa-solid fa-globe", "desc": "浏览器 CSS / API 兼容性查询" },
+    { "name": "Regex101", "url": "https://regex101.com/", "icon": "fa-solid fa-code", "desc": "正则表达式在线调试与解释" },
+    { "name": "JSON 在线解析", "url": "https://www.json.cn/", "icon": "fa-solid fa-code", "desc": "JSON 格式化、校验与转义" }
+  ],
+
+  "设计资源": [
+    { "name": "WebStack", "url": "https://webstack.cc/", "icon": "fa-solid fa-compass", "desc": "本页 UI 参考的经典网址导航项目" },
+    { "name": "Font Awesome", "url": "https://fontawesome.com/icons", "icon": "fa-brands fa-font-awesome", "desc": "图标库，复制类名即可使用" },
+    { "name": "iconfont", "url": "https://www.iconfont.cn/", "icon": "fa-solid fa-icons", "desc": "阿里巴巴矢量图标库" },
+    { "name": "Coolors", "url": "https://coolors.co/", "icon": "fa-solid fa-palette", "desc": "在线配色方案生成器" },
+    { "name": "Unsplash", "url": "https://unsplash.com/", "icon": "fa-solid fa-image", "desc": "免费高清可商用图库" }
+  ],
+
+  "AI 与效率": [
+    { "name": "DeepSeek", "url": "https://www.deepseek.com/", "icon": "fa-solid fa-robot", "desc": "大模型对话与推理" },
+    { "name": "腾讯文档", "url": "https://docs.qq.com/", "icon": "fa-solid fa-file-lines", "desc": "在线协作的文档 / 表格 / 幻灯片" },
+    { "name": "草料二维码", "url": "https://cli.im/", "icon": "fa-solid fa-qrcode", "desc": "二维码生成与管理" },
+    { "name": "ProcessOn", "url": "https://www.processon.com/", "icon": "fa-solid fa-diagram-project", "desc": "在线流程图 / 思维导图" }
+  ],
+
+  "常用站点": [
+    { "name": "百度", "url": "https://www.baidu.com/", "icon": "fa-solid fa-magnifying-glass", "desc": "中文搜索引擎" },
+    { "name": "Bilibili", "url": "https://www.bilibili.com/", "icon": "fa-solid fa-tv", "desc": "年轻人的文化社区与视频站" },
+    { "name": "知乎", "url": "https://www.zhihu.com/", "icon": "fa-solid fa-circle-question", "desc": "中文问答社区" },
+    { "name": "少数派", "url": "https://sspai.com/", "icon": "fa-solid fa-newspaper", "desc": "高效工作与品质生活指南" }
+  ]
+}

@@ -3,68 +3,367 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>小工具集 · aivrz</title>
+<title>网址导航 · aivrz</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
   :root{
-    --bg:#f6f8fb; --card:#fff; --ink:#1f2329; --sub:#5b6573; --line:#e5e9f0; --accent:#1677ff;
+    --bg:#f5f7fa; --panel:#ffffff; --panel-2:#fbfcfe;
+    --ink:#1f2733; --sub:#7b8794; --line:#eaeef4;
+    --accent:#3273dc; --accent-2:#5b9bff; --accent-soft:#eaf1fd;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.06);
+    --shadow-hover:0 2px 6px rgba(16,24,40,.06),0 14px 34px rgba(50,115,220,.16);
+    --radius:14px;
+  }
+  body.dark{
+    --bg:#12151a; --panel:#1a1f26; --panel-2:#20262e;
+    --ink:#e7ebf1; --sub:#93a0b0; --line:#2a313b;
+    --accent:#5b9bff; --accent-2:#7db0ff; --accent-soft:#1d283a;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.4);
+    --shadow-hover:0 2px 8px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.6;padding:28px 20px 70px}
-  .wrap{max-width:960px;margin:0 auto}
-  header h1{font-size:26px;margin:0 0 6px}
-  header p{color:var(--sub);margin:4px 0}
-  .tag{display:inline-block;background:#eaf2ff;color:var(--accent);border-radius:6px;padding:2px 10px;font-size:12px;margin-right:6px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:24px}
-  .tool{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);
-    border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(20,30,50,.05);transition:.15s}
-  .tool:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(22,119,255,.12);border-color:var(--accent)}
-  .tool .ic{font-size:26px;margin-bottom:8px}
-  .tool h3{margin:6px 0 4px;font-size:17px}
-  .tool p{margin:0;color:var(--sub);font-size:13.5px}
-  .tool .go{margin-top:10px;color:var(--accent);font-size:13px;font-weight:600}
-  footer{margin-top:50px;color:var(--sub);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
-  a.back{color:var(--accent);text-decoration:none}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit; text-decoration:none}
+
+  /* ---------- 侧边栏 ---------- */
+  .sidebar{
+    position:fixed; left:0; top:0; bottom:0; width:252px; z-index:40;
+    background:var(--panel); border-right:1px solid var(--line);
+    display:flex; flex-direction:column; transition:transform .25s ease;
+  }
+  .brand{display:flex; align-items:center; gap:11px; padding:20px 20px 14px}
+  .brand .logo{
+    width:38px; height:38px; border-radius:11px; flex:none;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:17px;
+    box-shadow:0 6px 16px rgba(50,115,220,.35);
+  }
+  .brand .bt{font-size:16px; font-weight:700; line-height:1.25}
+  .brand .bs{font-size:11.5px; color:var(--sub)}
+
+  .side-search{padding:6px 16px 12px}
+  .side-search .box{
+    display:flex; align-items:center; gap:8px; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:10px; padding:8px 12px;
+  }
+  .side-search .box:focus-within{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+  .side-search i{color:var(--sub); font-size:13px}
+  .side-search input{border:0; background:transparent; outline:none; width:100%; color:var(--ink); font-size:13.5px}
+
+  .cats{padding:4px 10px 14px; overflow-y:auto; flex:1}
+  .cats .cn-title{font-size:11px; color:var(--sub); letter-spacing:.08em; padding:8px 10px 6px; text-transform:uppercase}
+  .cats a{
+    display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px;
+    color:var(--sub); font-size:14px; margin-bottom:2px; transition:.15s; position:relative;
+  }
+  .cats a i{width:16px; text-align:center; font-size:13.5px}
+  .cats a .n{margin-left:auto; font-size:11.5px; color:var(--sub); opacity:.7}
+  .cats a:hover{background:var(--panel-2); color:var(--ink)}
+  .cats a.active{background:var(--accent-soft); color:var(--accent); font-weight:600}
+  .cats a.active .n{color:var(--accent)}
+
+  .side-foot{padding:14px 20px; border-top:1px solid var(--line); font-size:11.5px; color:var(--sub)}
+  .side-foot a{color:var(--accent)}
+
+  /* ---------- 主区域 ---------- */
+  .main{margin-left:252px; min-height:100vh; display:flex; flex-direction:column}
+  .topbar{
+    position:sticky; top:0; z-index:30; height:58px; display:flex; align-items:center; gap:14px;
+    padding:0 26px; background:var(--bg); background:color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter:saturate(160%) blur(10px); border-bottom:1px solid var(--line);
+  }
+  .topbar .top-title{font-size:15px; font-weight:700}
+  .topbar .spacer{flex:1}
+  .icon-btn{
+    width:36px; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--panel);
+    color:var(--ink); cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
+    font-size:14px; transition:.15s;
+  }
+  .icon-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .hamburger{display:none}
+  .topbar .home-link{
+    display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 15px; border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; font-size:13.5px; font-weight:600;
+    box-shadow:0 6px 16px rgba(50,115,220,.3);
+  }
+
+  .content{flex:1; width:100%; max-width:1240px; margin:0 auto; padding:24px 26px 40px}
+  .section{margin-bottom:30px; scroll-margin-top:72px}
+  .sec-head{display:flex; align-items:center; gap:9px; margin:0 0 14px; padding-left:2px}
+  .sec-head .bar{width:4px; height:18px; border-radius:2px; background:linear-gradient(var(--accent),var(--accent-2))}
+  .sec-head h2{font-size:16.5px; margin:0; font-weight:700}
+  .sec-head .cnt{font-size:12px; color:var(--sub); background:var(--panel); border:1px solid var(--line); padding:1px 9px; border-radius:20px}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(233px,1fr)); gap:13px}
+  .card{
+    display:flex; align-items:center; gap:12px; padding:13px 14px; background:var(--panel);
+    border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
+    transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease; overflow:hidden;
+  }
+  .card:hover{transform:translateY(-3px); box-shadow:var(--shadow-hover); border-color:var(--accent)}
+  .card .ico{
+    width:42px; height:42px; flex:none; border-radius:11px; display:flex; align-items:center; justify-content:center;
+    background:var(--accent-soft); color:var(--accent); font-size:19px; overflow:hidden;
+  }
+  .card .ico img{width:26px; height:26px; object-fit:contain; border-radius:6px}
+  .card .ico .fallback{font-weight:700; font-size:16px}
+  .card .meta{min-width:0; flex:1}
+  .card .nm{font-size:14.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .card .ds{font-size:12.3px; color:var(--sub); margin-top:1px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+  .card.hide{display:none}
+  .section.hide{display:none}
+
+  .empty{display:none; text-align:center; color:var(--sub); padding:60px 0; font-size:14px}
+  .empty.show{display:block}
+
+  footer.page-foot{
+    border-top:1px solid var(--line); padding:18px 26px; text-align:center; color:var(--sub); font-size:12.3px;
+  }
+  footer.page-foot code{background:var(--panel-2); border:1px solid var(--line); border-radius:5px; padding:1px 6px}
+
+  .scrim{position:fixed; inset:0; background:rgba(10,15,25,.45); z-index:35; opacity:0; pointer-events:none; transition:.2s}
+  .scrim.show{opacity:1; pointer-events:auto}
+
+  @media (max-width:980px){
+    .sidebar{transform:translateX(-100%)}
+    .sidebar.open{transform:none; box-shadow:0 0 40px rgba(0,0,0,.25)}
+    .main{margin-left:0}
+    .hamburger{display:inline-flex}
+    .content{padding:18px 16px 34px}
+    .topbar{padding:0 14px}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:11px}
+    .card{padding:12px}
+    .card .ico{width:38px; height:38px; font-size:17px}
+    .topbar .top-title{display:none}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>小工具集</h1>
-    <p><span class="tag">GitHub Pages</span><span class="tag">纯静态</span><span class="tag">即用即走</span></p>
-    <p>这里汇总托管在 <code>aivrz.github.io</code> 下的各类轻量静态小工具。每个工具都是一个独立文件夹，打开即用，无需后端。</p>
-  </header>
 
-  <!-- 新增工具时，复制下面任意一个 .tool 卡片并修改链接/文案即可 -->
-  <div class="grid">
-    <a class="tool" href="index.html">
-      <div class="ic">🎰</div>
-      <h3>美食老虎机</h3>
-      <p>今天吃啥？一键随机推荐美食，带分享与二维码。</p>
-      <div class="go">打开 →</div>
-    </a>
+<!-- 侧边栏 -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="logo"><i class="fa-solid fa-compass"></i></div>
+    <div>
+      <div class="bt" id="brandTitle">网址导航</div>
+      <div class="bs" id="brandSub">加载中…</div>
+    </div>
+  </div>
+  <div class="side-search">
+    <div class="box"><i class="fa-solid fa-magnifying-glass"></i><input id="search" type="search" placeholder="搜索名称 / 描述 / 网址…" autocomplete="off"></div>
+  </div>
+  <nav class="cats" id="catNav"><div class="cn-title">分类导航</div></nav>
+  <div class="side-foot" id="sideFoot">内容来自 <code style="color:inherit">nav.json</code></div>
+</aside>
+<div class="scrim" id="scrim"></div>
 
-    <a class="tool" href="vcode/index.html">
-      <div class="ic">🎞️</div>
-      <h3>视频嵌入代码生成器</h3>
-      <p>粘贴视频链接，自动识别平台并返回可嵌入的 iframe 代码；含各平台限制与“vid 非法”等常见坑排查。</p>
-      <div class="go">打开 →</div>
-    </a>
-
-    <!-- 示例占位（上线后删掉或替换为真实工具）
-    <a class="tool" href="another-tool/index.html">
-      <div class="ic">🛠️</div>
-      <h3>新工具</h3>
-      <p>一句话描述这个工具的用途。</p>
-      <div class="go">打开 →</div>
-    </a>
-    -->
+<!-- 主区域 -->
+<div class="main">
+  <div class="topbar">
+    <button class="icon-btn hamburger" id="hamburger" aria-label="菜单"><i class="fa-solid fa-bars"></i></button>
+    <div class="top-title" id="topTitle">全部站点</div>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="themeBtn" aria-label="切换主题"><i class="fa-solid fa-moon"></i></button>
+    <a class="home-link" href="index.html"><i class="fa-solid fa-house"></i> 首页</a>
   </div>
 
-  <footer>
-    返回 <a class="back" href="index.html">首页（美食老虎机）</a> ｜ 小工具集为纯静态页面，可直接部署到 GitHub Pages。
-  </footer>
+  <div class="content" id="content"></div>
+  <div class="empty" id="empty"><i class="fa-regular fa-face-frown" style="font-size:26px;display:block;margin-bottom:10px"></i>没有匹配的站点，换个关键词试试～</div>
+
+  <footer class="page-foot" id="pageFoot">纯静态导航页 · 修改 <code>nav.json</code> 即可更新导航内容</footer>
 </div>
+
+<script>
+/* ============ 兜底数据（当 fetch(nav.json) 失败，如 file:// 直接打开时使用） ============ */
+const DEFAULT_NAV = {
+  "_title": "aivrz · 网址导航",
+  "_subtitle": "小工具 · 常用站点 · 资源收藏",
+  "_footer": "纯静态页面 · 修改 nav.json 即可更新本页导航，无需改动 HTML",
+  "本站工具": [
+    { "name": "美食老虎机", "url": "index.html", "icon": "fa-solid fa-dice", "desc": "今天吃啥？老虎机 / 大转盘 / 刮刮乐 多玩法随机决策" },
+    { "name": "视频嵌入生成器", "url": "vcode/index.html", "icon": "fa-solid fa-film", "desc": "粘贴视频链接，自动识别平台并生成可嵌入的 iframe 代码" }
+  ],
+  "开发工具": [
+    { "name": "GitHub", "url": "https://github.com/", "icon": "fa-brands fa-github", "desc": "全球最大的代码托管与协作平台" },
+    { "name": "MDN Web Docs", "url": "https://developer.mozilla.org/zh-CN/", "icon": "fa-solid fa-book", "desc": "Web 开发权威文档，前端必备" },
+    { "name": "Can I use", "url": "https://caniuse.com/", "icon": "fa-solid fa-globe", "desc": "浏览器 CSS / API 兼容性查询" },
+    { "name": "Regex101", "url": "https://regex101.com/", "icon": "fa-solid fa-code", "desc": "正则表达式在线调试与解释" },
+    { "name": "JSON 在线解析", "url": "https://www.json.cn/", "icon": "fa-solid fa-code", "desc": "JSON 格式化、校验与转义" }
+  ],
+  "设计资源": [
+    { "name": "WebStack", "url": "https://webstack.cc/", "icon": "fa-solid fa-compass", "desc": "本页 UI 参考的经典网址导航项目" },
+    { "name": "Font Awesome", "url": "https://fontawesome.com/icons", "icon": "fa-brands fa-font-awesome", "desc": "图标库，复制类名即可使用" },
+    { "name": "iconfont", "url": "https://www.iconfont.cn/", "icon": "fa-solid fa-icons", "desc": "阿里巴巴矢量图标库" },
+    { "name": "Coolors", "url": "https://coolors.co/", "icon": "fa-solid fa-palette", "desc": "在线配色方案生成器" },
+    { "name": "Unsplash", "url": "https://unsplash.com/", "icon": "fa-solid fa-image", "desc": "免费高清可商用图库" }
+  ],
+  "AI 与效率": [
+    { "name": "DeepSeek", "url": "https://www.deepseek.com/", "icon": "fa-solid fa-robot", "desc": "大模型对话与推理" },
+    { "name": "腾讯文档", "url": "https://docs.qq.com/", "icon": "fa-solid fa-file-lines", "desc": "在线协作的文档 / 表格 / 幻灯片" },
+    { "name": "草料二维码", "url": "https://cli.im/", "icon": "fa-solid fa-qrcode", "desc": "二维码生成与管理" },
+    { "name": "ProcessOn", "url": "https://www.processon.com/", "icon": "fa-solid fa-diagram-project", "desc": "在线流程图 / 思维导图" }
+  ],
+  "常用站点": [
+    { "name": "百度", "url": "https://www.baidu.com/", "icon": "fa-solid fa-magnifying-glass", "desc": "中文搜索引擎" },
+    { "name": "Bilibili", "url": "https://www.bilibili.com/", "icon": "fa-solid fa-tv", "desc": "年轻人的文化社区与视频站" },
+    { "name": "知乎", "url": "https://www.zhihu.com/", "icon": "fa-solid fa-circle-question", "desc": "中文问答社区" },
+    { "name": "少数派", "url": "https://sspai.com/", "icon": "fa-solid fa-newspaper", "desc": "高效工作与品质生活指南" }
+  ]
+};
+
+const $ = s => document.querySelector(s);
+const METAGONE = /^_/;
+
+/* 把 nav.json（分类名 -> 链接数组；键以 _ 开头为元信息）解析为内部结构 */
+function normalize(raw){
+  const meta = { title:'网址导航', subtitle:'', footer:'' };
+  const cats = [];
+  if(!raw || typeof raw !== 'object') return { meta, cats };
+  for(const key of Object.keys(raw)){
+    if(key === '_title'){ meta.title = raw[key]; continue; }
+    if(key === '_subtitle'){ meta.subtitle = raw[key]; continue; }
+    if(key === '_footer'){ meta.footer = raw[key]; continue; }
+    if(METAGONE.test(key)) continue;
+    let arr = raw[key], icon = '';
+    if(!Array.isArray(arr) && arr && typeof arr === 'object'){ icon = arr.icon || ''; arr = arr.links || arr.items || []; }
+    if(!Array.isArray(arr)) continue;
+    const links = arr.filter(x => x && x.name && x.url);
+    if(!links.length) continue;
+    cats.push({ name:key, icon, links });
+  }
+  return { meta, cats };
+}
+
+function isExternal(url){ return /^https?:\/\//i.test(url); }
+
+/* 图标：FontAwesome 类名 / 图片地址（含相对路径）/ 首字兜底 */
+function iconHTML(link){
+  const ic = (link.icon || '').trim();
+  if(/^https?:\/\//i.test(ic) || /^\.?\.?\//.test(ic) || /\.(png|jpe?g|svg|webp|ico|gif)(\?|$)/i.test(ic)){
+    return '<img src="'+ic+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+  }
+  if(ic.indexOf('fa-') >= 0) return '<i class="'+ic+'"></i>';
+  const ch = (link.name || '?').trim().charAt(0).toUpperCase();
+  return '<span class="fallback">'+ch+'</span>';
+}
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function render(data){
+  const { meta, cats } = normalize(data);
+
+  document.title = meta.title + ' · aivrz';
+  $('#brandTitle').textContent = meta.title;
+  $('#brandSub').textContent = meta.subtitle || '';
+  $('#pageFoot').innerHTML = (meta.footer || '纯静态导航页') + ' · 修改 <code>nav.json</code> 即可更新';
+
+  const catNav = $('#catNav');
+  const content = $('#content');
+  catNav.innerHTML = '<div class="cn-title">分类导航</div>';
+  content.innerHTML = '';
+  const navLinks = [];
+
+  cats.forEach((cat, i) => {
+    const sid = 'sec-' + i;
+
+    // 侧边栏分类项
+    const a = document.createElement('a');
+    a.href = '#' + sid;
+    a.innerHTML = '<i class="'+(cat.icon || 'fa-solid fa-folder-open')+'"></i><span>'+esc(cat.name)+'</span><span class="n">'+cat.links.length+'</span>';
+    catNav.appendChild(a);
+    navLinks.push(a);
+
+    // 内容分区
+    const sec = document.createElement('section');
+    sec.className = 'section';
+    sec.id = sid;
+    const cards = cat.links.map(lk => {
+      const ext = isExternal(lk.url);
+      const tgt = ext ? ' target="_blank" rel="noopener"' : '';
+      const ds = lk.desc ? '<div class="ds">'+esc(lk.desc)+'</div>' : '';
+      const t = esc((lk.name+' '+(lk.desc||'')+' '+lk.url).toLowerCase());
+      return '<a class="card" href="'+esc(lk.url)+'"'+tgt+' data-t="'+t+'">'
+        + '<div class="ico">'+iconHTML(lk)+'</div>'
+        + '<div class="meta"><div class="nm">'+esc(lk.name)+'</div>'+ds+'</div>'
+        + '</a>';
+    }).join('');
+    sec.innerHTML = '<div class="sec-head"><span class="bar"></span><h2>'+esc(cat.name)+'</h2><span class="cnt">'+cat.links.length+'</span></div>'
+                  + '<div class="grid">'+cards+'</div>';
+    content.appendChild(sec);
+    a.dataset.target = sid;
+  });
+
+  // 滚动高亮
+  const secEls = [...content.querySelectorAll('.section')];
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if(en.isIntersecting){
+          navLinks.forEach(x => x.classList.toggle('active', x.dataset.target === en.target.id));
+        }
+      });
+    }, { rootMargin: '-72px 0px -70% 0px', threshold: 0 });
+    secEls.forEach(s => io.observe(s));
+  }
+  if(navLinks[0]) navLinks[0].classList.add('active');
+}
+
+/* ---------- 搜索过滤 ---------- */
+function applySearch(q){
+  q = (q || '').trim().toLowerCase();
+  const cards = [...document.querySelectorAll('#content .card')];
+  const secs = [...document.querySelectorAll('#content .section')];
+  let any = false;
+  cards.forEach(c => {
+    const hit = !q || (c.dataset.t || '').indexOf(q) >= 0;
+    c.classList.toggle('hide', !hit);
+    if(hit) any = true;
+  });
+  secs.forEach(s => {
+    const vis = [...s.querySelectorAll('.card')].some(c => !c.classList.contains('hide'));
+    s.classList.toggle('hide', !vis);
+  });
+  $('#empty').classList.toggle('show', q && !any);
+}
+
+/* ---------- 主题 ---------- */
+function setTheme(dark){
+  document.body.classList.toggle('dark', dark);
+  $('#themeBtn').innerHTML = '<i class="fa-solid fa-'+(dark?'sun':'moon')+'"></i>';
+  try{ localStorage.setItem('nav_theme', dark ? '1' : '0'); }catch(e){}
+}
+
+/* ---------- 初始化 ---------- */
+(function init(){
+  // 主题
+  let dark = false;
+  try{ dark = localStorage.getItem('nav_theme') === '1'; }catch(e){}
+  if(!dark && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) dark = true;
+  setTheme(dark);
+  $('#themeBtn').onclick = () => setTheme(!document.body.classList.contains('dark'));
+
+  // 侧边栏（移动端）
+  const sb = $('#sidebar'), scrim = $('#scrim');
+  const closeSb = () => { sb.classList.remove('open'); scrim.classList.remove('show'); };
+  $('#hamburger').onclick = () => { sb.classList.toggle('open'); scrim.classList.toggle('show'); };
+  scrim.onclick = closeSb;
+  $('#catNav').addEventListener('click', e => { if(e.target.closest('a')) closeSb(); });
+
+  // 搜索
+  $('#search').addEventListener('input', e => applySearch(e.target.value));
+
+  // 加载 nav.json（失败则用兜底）
+  render(DEFAULT_NAV); // 先渲染兜底，避免空白闪烁
+  fetch('nav.json', { cache:'no-store' })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status)))
+    .then(json => render(json))
+    .catch(err => { console.warn('[nav] 使用内置兜底数据：', err && err.message); });
+})();
+</script>
 </body>
 </html>
